@@ -26,8 +26,8 @@ public class AnnouncementController {
     private ListMapper listMapper;
 
     @GetMapping("")
-    public List<Announcement> getAllAnnouncement(@RequestParam(required = false) String mode) {
-        return announcementService.getAllAnnouncement(mode);
+    public List<AnnouncementDTO> getAllAnnouncement(@RequestParam(required = false) String mode) {
+        return listMapper.mapList(announcementService.getAllAnnouncement(mode), AnnouncementDTO.class, modelMapper);
     }
 
     @GetMapping("/{id}")
