@@ -7,15 +7,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import sit.int221.dtos.AnnouncementDTO;
 import sit.int221.dtos.CreateAndUpdateAnnouncementDTO;
-import sit.int221.dtos.PageDTO;
 import sit.int221.entities.Announcement;
 import sit.int221.entities.Category;
 import sit.int221.exceptions.AnnouncementNotFoundException;
 import sit.int221.repositories.AnnouncementRepository;
 import sit.int221.utils.AnnouncementDisplay;
-import sit.int221.utils.ListMapper;
 
 import java.time.ZonedDateTime;
 import java.util.Comparator;
