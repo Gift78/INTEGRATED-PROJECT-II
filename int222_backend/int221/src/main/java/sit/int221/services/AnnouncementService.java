@@ -60,6 +60,7 @@ public class AnnouncementService {
         Category category = categoryService.getCategory(announcement.getCategoryId());
         Announcement newAnnouncement = modelMapper.map(announcement, Announcement.class);
         newAnnouncement.setCategory(category);
+        newAnnouncement.setViewCount(0);
         return announcementRepository.saveAndFlush(newAnnouncement);
     }
 
