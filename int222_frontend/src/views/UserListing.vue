@@ -1,5 +1,7 @@
 <script setup>
 import TimezoneComponent from '../components/TimezoneComponent.vue'
+import Title from '../components/Title.vue';
+import NavbarComponent from '../components/NavbarComponent.vue'
 import { getAllUsers } from '../composable/getData.js'
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -16,21 +18,13 @@ onMounted(async () => {
 <template>
     <div class="w-full  text-cyan-800 flex">
         <div class="w-1/6 bg-white rounded-br-3xl rounded-tr-3xl fixed h-screen shadow-2xl">
-            <div class="ann-app-title ml-14 pt-20 text-4xl">SAS</div>
-            <div class="flex-col text-xl pt-10">
-                <hr>
-                <button class="ann-menu py-5 w-full text-left pl-14 bg-white hover:bg-emerald-100">Announcement</button>
-                <hr>
-                <button class="ann-menu py-5 w-full text-left pl-14 bg-emerald-100 hover:bg-emerald-100">User</button>
-                <hr>
-            </div>
+            <NavbarComponent />
         </div>
-        <div class="w-1/6">
-        </div>
-        <div class="w-5/6 py-20 px-5">
-            <div class="ann-title text-center text-4xl">User Management</div>
+        <div class="w-1/6"></div>
+        <div class="w-5/6 py-10 px-20">
+            <Title text="User Management" />
             <div class="flex justify-between">
-                <TimezoneComponent></TimezoneComponent>
+                <TimezoneComponent />
                 <button
                     class="ann-button px-5 rounded-lg text-white bg-emerald-plus hover:bg-emerald-light hover:scale-110">Add
                     User</button>

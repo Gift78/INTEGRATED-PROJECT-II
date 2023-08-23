@@ -1,4 +1,5 @@
 <script setup>
+import NavbarComponent from '../components/NavbarComponent.vue'
 import { getUserById } from '../composable/getData.js'
 import { useRoute, useRouter } from 'vue-router';
 import Swal from 'sweetalert2'
@@ -44,16 +45,7 @@ const showBackButtonConfirmation = () => {
         <div class="flex flex-row w-full h-full">
             <div class="w-full  text-cyan-800 flex">
                 <div class="w-1/6 bg-white rounded-br-3xl rounded-tr-3xl fixed h-screen shadow-2xl">
-                    <div class="ann-app-title ml-14 pt-20 text-4xl">SAS</div>
-                    <div class="flex-col text-xl pt-10">
-                        <hr>
-                        <button
-                            class="ann-menu py-5 w-full text-left pl-14 bg-white hover:bg-emerald-100">Announcement</button>
-                        <hr>
-                        <button
-                            class="ann-menu py-5 w-full text-left pl-14 bg-emerald-100 hover:bg-emerald-100">User</button>
-                        <hr>
-                    </div>
+                    <NavbarComponent />
                 </div>
                 <div class="w-1/6">
                 </div>
