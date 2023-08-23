@@ -15,6 +15,10 @@ export default {
         "smoke":"#C9C9C9",
         "smoke-light":"#EBEBEB"
       },
+      gridTemplateColumns: {
+        // Simple 16 column grid
+        '14': 'repeat(14, minmax(0, 1fr))',
+      },
     },
     
   },

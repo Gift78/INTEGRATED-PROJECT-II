@@ -129,6 +129,27 @@ const getAnnoucementPageByCategoryId = async (mode, page, size, catId) => {
     console.log(err);
   }
 };
+
+const getAllUsers = async () => {
+  try {
+    const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/users`);
+    if (res.ok) {
+      const users = await res.json();
+      return users;
+    } else if (res.status === 404) {
+      throw new Error("404 Not Found");
+    } else if (res.status === 500) {
+      throw new Error("500 Internal Server Error");
+    } else if (res.status === 503) {
+      throw new Error("503 Service Unavailable");
+    } else {
+      throw new Error("Something went wrong.");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export {
   getAllData,
   getDataById,
@@ -136,4 +157,5 @@ export {
   getCategoryById,
   getDataByPage,
   getAnnoucementPageByCategoryId,
+  getAllUsers,
 };
