@@ -1,4 +1,4 @@
-package sit.int221.entities;
+package sit.int221.dtos;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,19 +11,11 @@ import sit.int221.utils.UserRole;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserDTO {
     private Integer id;
     private String username;
     private String name;
     private String email;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @Column(name = "createdOn", insertable = false, updatable = false)
-    private String createdOn;
-    @Column(name = "updatedOn", insertable = false)
-    private String updatedOn;
 }

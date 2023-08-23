@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import sit.int221.entities.User;
+import sit.int221.exceptions.UserNotFoundException;
 import sit.int221.repositories.UserRepositttory;
 
 import java.util.List;
@@ -16,5 +17,9 @@ public class UserService {
     public List<User> getAllUser(){
         Sort sortRoleAndUsername = Sort.by(Sort.Direction.ASC, "role", "username");
         return userRepositttory.findAll(sortRoleAndUsername);
+    }
+
+    public User getUser(Integer userId){
+        return userRepositttory.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

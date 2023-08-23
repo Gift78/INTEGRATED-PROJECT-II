@@ -1,10 +1,9 @@
 package sit.int221.controllers;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import sit.int221.dtos.UserDTO;
 import sit.int221.entities.User;
 import sit.int221.services.UserService;
 
@@ -16,9 +15,16 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping
     public List<User> getAllUser(){
         return userService.getAllUser();
+    }
+
+    @GetMapping("/{id}")
+    public UserDTO getUser(@PathVariable Integer id){
+        return modelMapper.map(userService.getUser(id), UserDTO.class);
     }
 }
