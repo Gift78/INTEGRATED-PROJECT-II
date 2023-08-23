@@ -28,10 +28,10 @@ const getDataById = async (id, isCount) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-        "/api/announcements/" +
-        id +
-        "?count=" +
-        isCount
+      "/api/announcements/" +
+      id +
+      "?count=" +
+      isCount
     );
     if (res.ok) {
       const data = await res.json();
@@ -88,7 +88,7 @@ const getDataByPage = async (mode, page, size) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-        `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}`
+      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}`
     );
     if (res.ok) {
       const data = await res.json();
@@ -111,7 +111,7 @@ const getAnnoucementPageByCategoryId = async (mode, page, size, catId) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-        `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}&category=${catId}`
+      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}&category=${catId}`
     );
     if (res.ok) {
       const data = await res.json();
@@ -150,6 +150,23 @@ const getAllUsers = async () => {
   }
 };
 
+const getUserById = async (id) => {
+  try {
+    const res = await fetch(
+      import.meta.env.VITE_ROOT_API +
+      "/api/users/" + id
+    );
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    } else {
+      throw new Error("Something went wrong.");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export {
   getAllData,
   getDataById,
@@ -158,4 +175,5 @@ export {
   getDataByPage,
   getAnnoucementPageByCategoryId,
   getAllUsers,
+  getUserById,
 };
