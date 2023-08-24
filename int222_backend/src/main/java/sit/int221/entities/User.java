@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.utils.UserRole;
 
+import java.time.ZonedDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +25,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
     @Column(name = "createdOn", insertable = false, updatable = false)
-    private String createdOn;
+    private ZonedDateTime createdOn;
     @Column(name = "updatedOn", insertable = false)
-    private String updatedOn;
+    private ZonedDateTime updatedOn;
 }
