@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { formatDatetimeLocal } from '../composable/formatDatetime';
 import Title from '../components/Title.vue';
 import TimezoneComponent from '../components/TimezoneComponent.vue';
+import NavbarComponent from '../components/NavbarComponent.vue'
 import ViewCounter from '../components/icons/ViewCounter.vue';
 import { getDataById } from '../composable/getData';
 import Swal from 'sweetalert2';

@@ -11,6 +11,7 @@ const users = ref([])
 
 onMounted(async () => {
     users.value = await getUserById(params?.id)
+    console.log(users.value)
     if (users.value === undefined || users.value === null) {
         Swal.fire({
             icon: 'error',
@@ -63,11 +64,15 @@ const showBackButtonConfirmation = () => {
                             <option>admin</option>
                             <option>announcer</option>
                         </select>
-                        <div class="flex">
+                        <div class="flex mt-4">
+                            <div class="mr-10"><span class="font-bold mr-3">Created On</span>  {{ users.createdOn }}</div>
+                            <div><span class="font-bold mr-3">Updated On</span>{{ users.updatedOn }}</div>
+                        </div>
+                        <div class="flex mt-4">
                             <button
-                                class="text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg hover:scale-110 w-28 h-12 mt-10 rounded-lg">Save</button>
+                                class="text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg">Save</button>
                             <button
-                                class="text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg hover:scale-110 w-28 h-12 mt-10 ml-5 rounded-lg"
+                                class="text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg hover:scale-110 w-28 h-12 ml-5 rounded-lg"
                                 @click="showBackButtonConfirmation()">
                                 Cancel
                             </button>
