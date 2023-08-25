@@ -1,6 +1,5 @@
 package sit.int221.services;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -27,24 +26,32 @@ public class UserService {
     }
 
     public User createUser(User newUser){
+        String trimmedName = newUser.getName().trim();
+        String trimmedUsername = newUser.getUsername().trim();
+        String trimmedEmail = newUser.getEmail().trim();
+
         User existName = userRepository.findByName(newUser.getName());
         User existUserName = userRepository.findByUsername(newUser.getUsername());
         User existEmail = userRepository.findByEmail(newUser.getEmail());
         if (existName != null || existUserName != null || existEmail != null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The required must be unique");
-        }else {
-            newUser.setUsername(newUser.getUsername());
-            newUser.setName(newUser.getName());
-            newUser.setEmail(newUser.getEmail());
+        } else {
+            newUser.setUsername(trimmedUsername);
+            newUser.setName(trimmedName);
+            newUser.setEmail(trimmedEmail);
             return userRepository.saveAndFlush(newUser);
         }
     }
 
     public User updateUser(Integer userId,User userDetail){
+        String trimmedName = userDetail.getName().trim();
+        String trimmedUsername = userDetail.getUsername().trim();
+        String trimmedEmail = userDetail.getEmail().trim();
+
         User existUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        existUser.setName(userDetail.getName());
-        existUser.setUsername(userDetail.getUsername());
-        existUser.setEmail(userDetail.getEmail());
+        existUser.setName(trimmedName);
+        existUser.setUsername(trimmedUsername);
+        existUser.setEmail(trimmedEmail);
         existUser.setRole(userDetail.getRole());
         return userRepository.saveAndFlush(existUser);
     }
