@@ -39,7 +39,7 @@ public class UserController {
     public UserDTO createUser(@RequestBody User newUser){
         userService.createUser(newUser);
         entityManager.refresh(newUser);
-        return modelMapper.map(newUser,UserDTO.class);
+        return modelMapper.map(newUser, UserDTO.class);
     }
 
     @PutMapping("/{userId}")
