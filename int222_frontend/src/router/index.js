@@ -50,7 +50,7 @@ const router = createRouter({
       component: UserListing,
     },
     {
-      path: "/admin/user/:id",
+      path: "/admin/user/:id/edit",
       name: "UserDetail",
       component: UserManagement,
     },
