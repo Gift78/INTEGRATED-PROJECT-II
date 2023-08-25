@@ -14,6 +14,23 @@ const formatDatetimeLocal = (datetime) => {
   return formattedDate;
 };
 
+const formatDatetimeLocalUTC = (datetime) => {
+  if (!datetime) return null;
+
+  const date = new Date(datetime);
+  const options = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZone: "UTC",
+  };
+
+  const formattedDate = date.toLocaleString("en-GB", options);
+  return formattedDate;
+};
+
 const getFormattedDate = (date) => {
   if (date === null || date === undefined || date === '' || date === 'Invalid Date') {
       return '';
@@ -44,4 +61,4 @@ const getFormattedDateTimeISO = (date, time) => {
   return dateObj
 }
 
-export { formatDatetimeLocal, getFormattedDate, getFormattedTime, getFormattedDateTimeISO };
+export { formatDatetimeLocal, getFormattedDate, getFormattedTime, getFormattedDateTimeISO, formatDatetimeLocalUTC };
