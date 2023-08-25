@@ -46,4 +46,16 @@ public class UserService {
             return userRepository.saveAndFlush(newUser);
         }
     }
+
+    public User updateUser(Integer userId,User userDetail){
+        User existUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        String trimmedName = userDetail.getName().replaceAll("\\s+","").trim();
+        String trimmedUserName = userDetail.getUsername().replaceAll("\\s+","").trim();
+        String trimmedEmail = userDetail.getEmail().replaceAll("\\s+","").trim();
+        existUser.setName(trimmedName);
+        existUser.setUsername(trimmedUserName);
+        existUser.setEmail(trimmedEmail);
+        existUser.setRole(userDetail.getRole());
+        return userRepository.saveAndFlush(existUser);
+    }
 }
