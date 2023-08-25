@@ -5,13 +5,58 @@ import NavbarComponent from '../components/NavbarComponent.vue'
 import { getAllUsers } from '../composable/getData.js'
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { formatDatetimeLocalUTC } from '../composable/formatDatetime';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const users = ref([])
 onMounted(async () => {
     users.value = await getAllUsers();
 });
+
+const deleteUser = async (id) => {
+    try {
+        const res = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/" + id, {
+            method: 'DELETE'
+        })
+        if (res.status === 200) {
+            users.value = users.value.filter((user) => {
+                return user.id !== id;
+            })
+        } else {
+            const errorData = await res.json();
+            Swal.fire({
+                icon: 'error',
+                title: `Error ${errorData.status}`,
+                text: errorData.message,
+                confirmButtonColor: '#155e75',
+            })
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: `Error ${error.status}`,
+            text: error.message,
+            confirmButtonColor: '#155e75',
+        })
+    }
+}
+
+const showDeleteModal = (id) => {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        confirmButtonColor: '#155e75',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep it'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            deleteUser(id)
+        }
+    })
+}
+
 </script>
  
 <template>
@@ -25,10 +70,8 @@ onMounted(async () => {
             <div class="flex justify-between">
                 <TimezoneComponent />
                 <button
-                    class="ann-button px-5 rounded-lg text-white bg-emerald-plus hover:bg-emerald-light hover:scale-110"
-                    @click="router.push({ name: 'AddUser' })">
-                    Add User
-                </button>
+                    class="ann-button px-5 rounded-lg text-white bg-emerald-plus hover:bg-emerald-light hover:scale-110">Add
+                    User</button>
             </div>
             <hr class="my-5">
             <!-- head table -->
@@ -52,14 +95,15 @@ onMounted(async () => {
                 <div class="ann-name my-auto col-span-2">{{ user.name }}</div>
                 <div class="ann-email my-auto col-span-2">{{ user.email }}</div>
                 <div class="ann-role my-auto text-center">{{ user.role }}</div>
-                <div class="ann-created-on my-auto text-center col-span-2">{{ formatDatetimeLocalUTC(user.createdOn) }}</div>
-                <div class="ann-updated-on my-auto text-center col-span-2">{{ formatDatetimeLocalUTC(user.updatedOn) }}</div>
+                <div class="ann-createdOn my-auto text-center col-span-2">{{ user.createdOn }}</div>
+                <div class="ann-updatedOn my-auto text-center col-span-2">{{ user.updatedOn }}</div>
                 <div class="my-auto col-span-2 flex justify-center">
                     <button
                         class="ann-button text-orange-400 bg-orange-100 hover:bg-orange-200 hover:scale-110  rounded-lg w-16 h-12 shadow-sm mx-2"
-                        @click="router.push({ name: 'UserDetail', params: { id: user.id } })">edit</button>
+                        @click="router.push({ name: 'userDetail', params: { id: user.id } })">Edit</button>
                     <button
-                        class="ann-button text-red-400 bg-red-100 hover:bg-red-200 hover:scale-110  rounded-lg w-16 h-12 shadow-sm mx-2">Delete</button>
+                        class="ann-button text-red-400 bg-red-100 hover:bg-red-200 hover:scale-110  rounded-lg w-16 h-12 shadow-sm mx-2"
+                        @click="showDeleteModal(user.id)">Delete</button>
                 </div>
             </div>
         </div>
