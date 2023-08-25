@@ -4,12 +4,16 @@ import { getUserById } from '../composable/getData.js'
 import { formatDatetimeLocalUTC } from '../composable/formatDatetime';
 import { useRoute, useRouter } from 'vue-router';
 import Swal from 'sweetalert2'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 const router = useRouter();
 const params = useRoute().params;
 const user = ref([]);
 const isAddUserPage = ref(false);
+const username = ref('');
+const name = ref('');
+const email = ref('');
+const role = ref('announcer');
 
 onMounted(async () => {
     if (params?.id) {
@@ -24,15 +28,14 @@ onMounted(async () => {
             }).then(() => {
                 router.push({ name: 'UserListing' })
             })
+        } else {
+            username.value = user.value.username;
+            name.value = user.value.name;
+            email.value = user.value.email;
+            role.value = user.value.role;
         }
     } else {
         isAddUserPage.value = true;
-        user.value = {
-            username: '',
-            name: '',
-            email: '',
-            role: 'announcer'
-        }
     }
 })
 
@@ -54,10 +57,10 @@ const showBackButtonConfirmation = () => {
 
 const AddEditUser = async () => {
     const data = {
-        username: user.value.username,
-        name: user.value.name,
-        email: user.value.email,
-        role: user.value.role
+        username: username.value,
+        name: name.value,
+        email: email.value,
+        role: role.value
     }
 
     if (isAddUserPage.value !== true) {
@@ -116,6 +119,36 @@ const AddEditUser = async () => {
         }
     }
 }
+
+const isSubmitAllowed = computed(() => {
+    if (isSameValue.value === true || isEmpty.value === true) {
+        return false;
+    } else {
+        return true;
+    }
+})
+
+const isSameValue = computed(() => {
+    if (username.value === user.value.username &&
+        name.value === user.value.name &&
+        email.value === user.value.email &&
+        role.value === user.value.role) {
+        return true;
+    } else {
+        isSubmitAllowed.value = false;
+    }
+})
+
+const isEmpty = computed(() => {
+    if (username.value === '' ||
+        name.value === '' ||
+        email.value === '' ||
+        role.value === '') {
+        return true;
+    } else {
+        return false;
+    }
+})
 </script>
 <template>
     <div class="w-full h-screen bg-slate-100">
@@ -130,13 +163,13 @@ const AddEditUser = async () => {
                     <div class="text-4xl mt-4">User Detail:</div>
                     <div class="my-4">
                         <div class="text-lg text-black mt-4">Username</div>
-                        <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="user.username">
+                        <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="username">
                         <div class="text-lg text-black mt-4">Name</div>
-                        <input type="text" class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="user.name" maxlength="100">
+                        <input type="text" class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="name" maxlength="100">
                         <div class="text-lg text-black mt-4">Email</div>
-                        <input type="email" class="ann-email border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="user.email" maxlength="150">
+                        <input type="email" class="ann-email border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="email" maxlength="150">
                         <div class="text-lg text-black mt-4">Role</div>
-                        <select class="ann-role select select-bordered bg-white mt-3" v-model="user.role">
+                        <select class="ann-role select select-bordered bg-white mt-3" v-model="role">
                             <option>admin</option>
                             <option>announcer</option>
                         </select>
@@ -153,7 +186,9 @@ const AddEditUser = async () => {
                         <div class="flex mt-4">
                             <button 
                                 class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg"
-                                @click="AddEditUser()">
+                                :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
+                                @click="AddEditUser()"
+                                :disabled="!isSubmitAllowed">
                                 Save
                             </button>
                             <button 
