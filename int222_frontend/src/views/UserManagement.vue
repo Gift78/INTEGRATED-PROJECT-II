@@ -141,13 +141,13 @@ const AddEditUser = async () => {
                             <option>announcer</option>
                         </select>
                         <div class="flex mt-4" v-if="!isAddUserPage">
-                            <div class="ann-created-on mr-10">
+                            <div class="mr-10">
                                 <span class="font-bold mr-3">Created On</span>  
-                                {{ formatDatetimeLocalUTC(user.createdOn) }}
+                                <p class="ann-created-on">{{ formatDatetimeLocalUTC(user.createdOn) }}</p>
                             </div>
-                            <div class="ann-updated-on">
+                            <div>
                                 <span class="font-bold mr-3">Updated On</span>
-                                {{ formatDatetimeLocalUTC(user.updatedOn) }}
+                                <p class="ann-updated-on">{{ formatDatetimeLocalUTC(user.updatedOn) }}</p>
                             </div>
                         </div>
                         <div class="flex mt-4">
