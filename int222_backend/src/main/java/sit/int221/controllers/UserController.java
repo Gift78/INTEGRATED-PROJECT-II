@@ -49,4 +49,9 @@ public class UserController {
         entityManager.refresh(user);
         return modelMapper.map(user, UserDTO.class);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Integer id) {
+        userService.deleteUser(id);
+    }
 }

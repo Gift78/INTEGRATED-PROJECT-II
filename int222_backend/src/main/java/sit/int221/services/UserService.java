@@ -55,4 +55,8 @@ public class UserService {
         existUser.setRole(userDetail.getRole());
         return userRepository.saveAndFlush(existUser);
     }
+
+    public void deleteUser(Integer id) {
+        userRepository.deleteById(id);
+    }
 }
