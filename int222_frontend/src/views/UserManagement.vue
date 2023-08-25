@@ -63,6 +63,14 @@ const AddEditUser = async () => {
         role: role.value
     }
 
+    if (isSubmitAllowed.value !== true) {
+        toastMixin.fire({
+            icon: 'error',
+            title: 'Please fill in all the fields',
+        })
+        return;
+    }
+
     if (isAddUserPage.value !== true) {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/" + params.id, {
             method: 'PUT',
@@ -135,7 +143,7 @@ const isSameValue = computed(() => {
         role.value === user.value.role) {
         return true;
     } else {
-        isSubmitAllowed.value = false;
+        return false;
     }
 })
 
@@ -149,6 +157,18 @@ const isEmpty = computed(() => {
         return false;
     }
 })
+
+const toastMixin = Swal.mixin({
+    toast: true,
+    icon: 'error',
+    position: 'top-right',
+    showConfirmButton: false,
+    timer: 3000,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+});
 </script>
 <template>
     <div class="w-full h-screen bg-slate-100">
@@ -187,8 +207,7 @@ const isEmpty = computed(() => {
                             <button 
                                 class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg"
                                 :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
-                                @click="AddEditUser()"
-                                :disabled="!isSubmitAllowed">
+                                @click="AddEditUser()">
                                 Save
                             </button>
                             <button 
