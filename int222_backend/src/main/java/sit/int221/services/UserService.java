@@ -33,9 +33,17 @@ public class UserService {
         if (trimmedName.isEmpty() || trimmedUserName.isEmpty() || trimmedEmail.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The required cannot be empty");
         }
-        newUser.setName(trimmedName);
-        newUser.setUsername(trimmedUserName);
-        newUser.setEmail(trimmedEmail);
-        return userRepository.saveAndFlush(newUser);
+
+        User existName = userRepository.findByName(newUser.getName());
+        User existUserName = userRepository.findByUsername(newUser.getUsername());
+        User existEmail = userRepository.findByEmail(newUser.getEmail());
+        if (existName != null || existUserName != null || existEmail != null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The required must be unique");
+        }else {
+            newUser.setUsername(trimmedUserName);
+            newUser.setName(trimmedName);
+            newUser.setEmail(trimmedEmail);
+            return userRepository.saveAndFlush(newUser);
+        }
     }
 }

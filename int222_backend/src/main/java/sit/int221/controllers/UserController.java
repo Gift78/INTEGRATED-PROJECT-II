@@ -1,6 +1,7 @@
 package sit.int221.controllers;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,9 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private EntityManager entityManager;
+
     @GetMapping
     public List<User> getAllUser(){
         return userService.getAllUser();
@@ -31,8 +35,10 @@ public class UserController {
     }
 
     @PostMapping("")
+    @Transactional
     public UserDTO createUser(@RequestBody User newUser){
         userService.createUser(newUser);
+        entityManager.refresh(newUser);
         return modelMapper.map(newUser,UserDTO.class);
     }
 }
