@@ -6,6 +6,7 @@ import AdminAnnouncementDetail from "../views/AdminAnnouncementDetail.vue"
 import AddEditAnnouncement from "../views/AddEditAnnouncement.vue"
 import UserListing from "../views/UserListing.vue"
 import UserManagement from "../views/UserManagement.vue"
+import NotFound from "../views/NotFound.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,7 +59,12 @@ const router = createRouter({
       path: "/admin/user/add",
       name: "AddUser",
       component: UserManagement,
-    }
+    },
+    {
+      path: "/:notfoundpath(.*)",
+      name: "NotFound",
+      component: NotFound,
+    },
   ],
 });
 
