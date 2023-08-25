@@ -27,34 +27,24 @@ public class UserService {
     }
 
     public User createUser(User newUser){
-        String trimmedName = newUser.getName().replaceAll("\\s+","");
-        String trimmedUserName = newUser.getUsername().replaceAll("\\s+","");
-        String trimmedEmail = newUser.getEmail().replaceAll("\\s+","");
-        if (trimmedName.isEmpty() || trimmedUserName.isEmpty() || trimmedEmail.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The required cannot be empty");
-        }
-
         User existName = userRepository.findByName(newUser.getName());
         User existUserName = userRepository.findByUsername(newUser.getUsername());
         User existEmail = userRepository.findByEmail(newUser.getEmail());
         if (existName != null || existUserName != null || existEmail != null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The required must be unique");
         }else {
-            newUser.setUsername(trimmedUserName);
-            newUser.setName(trimmedName);
-            newUser.setEmail(trimmedEmail);
+            newUser.setUsername(newUser.getUsername());
+            newUser.setName(newUser.getName());
+            newUser.setEmail(newUser.getEmail());
             return userRepository.saveAndFlush(newUser);
         }
     }
 
     public User updateUser(Integer userId,User userDetail){
         User existUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        String trimmedName = userDetail.getName().replaceAll("\\s+","").trim();
-        String trimmedUserName = userDetail.getUsername().replaceAll("\\s+","").trim();
-        String trimmedEmail = userDetail.getEmail().replaceAll("\\s+","").trim();
-        existUser.setName(trimmedName);
-        existUser.setUsername(trimmedUserName);
-        existUser.setEmail(trimmedEmail);
+        existUser.setName(userDetail.getName());
+        existUser.setUsername(userDetail.getUsername());
+        existUser.setEmail(userDetail.getEmail());
         existUser.setRole(userDetail.getRole());
         return userRepository.saveAndFlush(existUser);
     }
