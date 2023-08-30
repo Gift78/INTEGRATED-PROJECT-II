@@ -6,7 +6,7 @@ import { getAllUsers } from '../composable/getData.js'
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
-import { formatDatetimeLocalUTC } from '../composable/formatDatetime';
+import { formatDatetimeLocal } from '../composable/formatDatetime';
 
 const router = useRouter();
 const users = ref([])
@@ -98,8 +98,8 @@ const showDeleteModal = (id) => {
                 <div class="ann-name my-auto col-span-2">{{ user.name }}</div>
                 <div class="ann-email my-auto col-span-2">{{ user.email }}</div>
                 <div class="ann-role my-auto text-center">{{ user.role }}</div>
-                <div class="ann-created-on my-auto text-center col-span-2">{{ formatDatetimeLocalUTC(user.createdOn) }}</div>
-                <div class="ann-updated-on my-auto text-center col-span-2">{{ formatDatetimeLocalUTC(user.updatedOn) }}</div>
+                <div class="ann-created-on my-auto text-center col-span-2">{{ formatDatetimeLocal(user.createdOn) }}</div>
+                <div class="ann-updated-on my-auto text-center col-span-2">{{ formatDatetimeLocal(user.updatedOn) }}</div>
                 <div class="my-auto col-span-2 flex justify-center">
                     <button
                         class="ann-button text-orange-400 bg-orange-100 hover:bg-orange-200 hover:scale-110  rounded-lg w-16 h-12 shadow-sm mx-2"

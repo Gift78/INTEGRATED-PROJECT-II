@@ -1,7 +1,7 @@
 <script setup>
 import NavbarComponent from '../components/NavbarComponent.vue'
 import { getUserById } from '../composable/getData.js'
-import { formatDatetimeLocalUTC } from '../composable/formatDatetime';
+import { formatDatetimeLocal } from '../composable/formatDatetime';
 import { useRoute, useRouter } from 'vue-router';
 import Swal from 'sweetalert2'
 import { ref, onMounted, computed } from 'vue';
@@ -196,11 +196,11 @@ const toastMixin = Swal.mixin({
                         <div class="flex mt-4" v-if="!isAddUserPage">
                             <div class="mr-10">
                                 <span class="font-bold mr-3">Created On</span>  
-                                <p class="ann-created-on">{{ formatDatetimeLocalUTC(user.createdOn) }}</p>
+                                <p class="ann-created-on">{{ formatDatetimeLocal(user.createdOn) }}</p>
                             </div>
                             <div>
                                 <span class="font-bold mr-3">Updated On</span>
-                                <p class="ann-updated-on">{{ formatDatetimeLocalUTC(user.updatedOn) }}</p>
+                                <p class="ann-updated-on">{{ formatDatetimeLocal(user.updatedOn) }}</p>
                             </div>
                         </div>
                         <div class="flex mt-4">
