@@ -9,8 +9,6 @@ import sit.int221.dtos.CreateAndUpdateAnnouncementDTO;
 public class DateValidator implements ConstraintValidator<ValidDate, CreateAndUpdateAnnouncementDTO> {
     @Override
     public boolean isValid(CreateAndUpdateAnnouncementDTO createAndUpdateAnnouncementDTO, ConstraintValidatorContext constraintValidatorContext) {
-        System.out.println("DateValidator: " + createAndUpdateAnnouncementDTO.getCloseDate() + " " + createAndUpdateAnnouncementDTO.getPublishDate());
-
         if (createAndUpdateAnnouncementDTO.getCloseDate() == null || createAndUpdateAnnouncementDTO.getPublishDate() == null) {
             return true;
         }
