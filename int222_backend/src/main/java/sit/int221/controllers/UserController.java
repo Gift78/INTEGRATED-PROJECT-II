@@ -2,9 +2,9 @@ package sit.int221.controllers;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.UserDTO;
 import sit.int221.entities.User;
@@ -36,7 +36,7 @@ public class UserController {
 
     @PostMapping("")
     @Transactional
-    public UserDTO createUser(@RequestBody User newUser){
+    public UserDTO createUser(@Valid @RequestBody User newUser){
         userService.createUser(newUser);
         entityManager.refresh(newUser);
         return modelMapper.map(newUser, UserDTO.class);
