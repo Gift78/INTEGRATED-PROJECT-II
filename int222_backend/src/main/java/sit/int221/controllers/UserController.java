@@ -37,9 +37,9 @@ public class UserController {
     @PostMapping("")
     @Transactional
     public UserDTO createUser(@Valid @RequestBody User newUser){
-        userService.createUser(newUser);
-        entityManager.refresh(newUser);
-        return modelMapper.map(newUser, UserDTO.class);
+        User user = userService.createUser(newUser);
+        entityManager.refresh(user);
+        return modelMapper.map(user, UserDTO.class);
     }
 
     @PutMapping("/{userId}")
