@@ -44,7 +44,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @Transactional
-    public UserDTO updateUser(@PathVariable Integer userId, @RequestBody User userDetail) {
+    public UserDTO updateUser(@PathVariable Integer userId,@Valid @RequestBody User userDetail) {
         User user = userService.updateUser(userId, userDetail);
         entityManager.refresh(user);
         return modelMapper.map(user, UserDTO.class);
