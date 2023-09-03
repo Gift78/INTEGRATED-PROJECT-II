@@ -2,9 +2,7 @@ package sit.int221.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.entities.User;
 import sit.int221.exceptions.UserNotFoundException;
 import sit.int221.repositories.UserRepository;
@@ -30,17 +28,10 @@ public class UserService {
         String trimmedUsername = newUser.getUsername().trim();
         String trimmedEmail = newUser.getEmail().trim();
 
-        User existName = userRepository.findByName(newUser.getName());
-        User existUserName = userRepository.findByUsername(newUser.getUsername());
-        User existEmail = userRepository.findByEmail(newUser.getEmail());
-        if (existName != null || existUserName != null || existEmail != null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The required must be unique");
-        } else {
-            newUser.setUsername(trimmedUsername);
-            newUser.setName(trimmedName);
-            newUser.setEmail(trimmedEmail);
-            return userRepository.saveAndFlush(newUser);
-        }
+        newUser.setUsername(trimmedUsername);
+        newUser.setName(trimmedName);
+        newUser.setEmail(trimmedEmail);
+        return userRepository.saveAndFlush(newUser);
     }
 
     public User updateUser(Integer userId,User userDetail){

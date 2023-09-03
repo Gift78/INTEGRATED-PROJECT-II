@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.utils.UserRole;
+import sit.int221.validators.ValidUnique;
 
 import java.time.ZonedDateTime;
 
@@ -19,8 +20,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @ValidUnique
     private String username;
+    @ValidUnique
     private String name;
+    @ValidUnique
     private String email;
     @Enumerated(EnumType.STRING)
     private UserRole role;
