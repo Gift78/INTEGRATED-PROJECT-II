@@ -1,6 +1,7 @@
 package sit.int221.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class User {
     @ValidUnique
     private String name;
     @ValidUnique
+    @Email(message = "must be a well-formed email address", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
     @Enumerated(EnumType.STRING)
     private UserRole role;
