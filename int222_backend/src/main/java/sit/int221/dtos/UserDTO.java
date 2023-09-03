@@ -17,14 +17,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class UserDTO {
     private Integer id;
-    @Size(max = 45)
-    @NotNull
     private String username;
-    @Size(max = 100)
-    @NotNull
     private String name;
-    @Size(max = 150)
-    @NotNull
     private String email;
     @Enumerated(EnumType.STRING)
     private UserRole role;
