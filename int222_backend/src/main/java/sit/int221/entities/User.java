@@ -27,18 +27,18 @@ public class User {
     @ValidUnique
     @NotNull
     @NotBlank(message = "must not empty")
-    @Size(max = 45,message = "This field size must between 1 to 45")
+    @Size(max = 45, message = "This field size must between 1 to 45")
     private String username;
     @ValidUnique
     @NotNull
     @NotBlank(message = "must not empty")
-    @Size(max = 100,message = "This field size must between 1 to 45")
+    @Size(max = 100, message = "This field size must between 1 to 45")
     private String name;
     @ValidUnique
     @Email(message = "must be a well-formed email address", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     @NotNull
     @NotBlank(message = "must not empty")
-    @Size(max = 150,message = "This field size must between 1 to 45")
+    @Size(max = 150, message = "This field size must between 1 to 45")
     private String email;
     @Enumerated(EnumType.STRING)
     private UserRole role;
