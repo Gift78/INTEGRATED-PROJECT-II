@@ -1,4 +1,4 @@
-package sit.int221.entities;
+package sit.int221.dtos;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,26 +12,25 @@ import lombok.Setter;
 import sit.int221.utils.UserRole;
 import sit.int221.validators.ValidUnique;
 
-import java.time.ZonedDateTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "user")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class UpdateUserDTO {
+    @NotNull
+    @NotBlank(message = "must not empty")
+    @Size(max = 45, message = "This field size must between 1 to 45")
     private String username;
-    private String password;
+
+    @NotNull @NotBlank(message = "must not empty")
+    @Size(max = 100, message = "This field size must between 1 to 45")
     private String name;
+
+    @NotNull @NotBlank(message = "must not empty")
+    @Size(max = 150, message = "This field size must between 1 to 45")
+    @Email(message = "must be a well-formed email address", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @Column(name = "createdOn", insertable = false, updatable = false)
-    private ZonedDateTime createdOn;
-    @Column(name = "updatedOn", insertable = false, updatable = false)
-    private ZonedDateTime updatedOn;
 }
