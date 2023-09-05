@@ -1,37 +1,37 @@
 package sit.int221.dtos;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.utils.UserRole;
+import sit.int221.validators.ValidUniqueOnCreate;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ValidUniqueOnCreate
 public class CreateUserDTO {
-    @NotNull
-    @NotBlank(message = "must not empty")
-    @Size(max = 45, message = "This field size must between 1 to 45")
+    @NotBlank
+    @Size(max = 45, message = "size must be between 1 and 45")
     private String username;
 
-    @NotNull
-    @Size(min = 8, max = 14, message = "This field size must between 8 to 14")
+    @NotBlank
+    @Size(min = 8, max = 14, message = "size must be between 8 and 14")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W_]).+$",
+            message = "must be 8-14 characters long, at least 1 of uppercase, lowercase, number and special characters")
     private String password;
 
-    @NotNull @NotBlank(message = "must not empty")
-    @Size(max = 100, message = "This field size must between 1 to 45")
+    @NotBlank
+    @Size(max = 100, message = "size must be between 1 and 100")
     private String name;
 
-    @NotNull @NotBlank(message = "must not empty")
-    @Size(max = 150, message = "This field size must between 1 to 45")
-    @Email(message = "must be a well-formed email address", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+    @NotBlank
+    @Size(max = 150, message = "size must be between 1 and 150")
+    @Email(message = "Email should be valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
 
     @Enumerated(EnumType.STRING)
