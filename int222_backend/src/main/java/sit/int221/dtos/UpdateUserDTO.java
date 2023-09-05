@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.utils.UserRole;
-import sit.int221.validators.ValidUnique;
 
 @Getter
 @Setter
