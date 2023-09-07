@@ -15,14 +15,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Integer countByName(String name);
 
     User findByUsername(String string);
-
-    Integer countByEmailAndIdNot(String string, Integer id);
-
-    Integer countByNameAndIdNot(String string, Integer id);
-
     User findByEmail(String string);
-
-    Integer countByUsernameAndIdNot(String string, Integer id);
-
     User findByName(String string);
 }
