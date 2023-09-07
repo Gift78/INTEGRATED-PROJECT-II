@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sit.int221.dtos.CreateUserDTO;
+import sit.int221.dtos.UpdateUserDTO;
 import sit.int221.dtos.UserDTO;
 import sit.int221.entities.User;
 import sit.int221.services.UserService;
@@ -36,7 +38,7 @@ public class UserController {
 
     @PostMapping("")
     @Transactional
-    public UserDTO createUser(@Valid @RequestBody User newUser){
+    public UserDTO createUser(@Valid @RequestBody CreateUserDTO newUser){
         User user = userService.createUser(newUser);
         entityManager.refresh(user);
         return modelMapper.map(user, UserDTO.class);
@@ -44,7 +46,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @Transactional
-    public UserDTO updateUser(@PathVariable Integer userId, @Valid @RequestBody User userDetail) {
+    public UserDTO updateUser(@PathVariable Integer userId, @Valid @RequestBody UpdateUserDTO userDetail) {
         User user = userService.updateUser(userId, userDetail);
         entityManager.refresh(user);
         return modelMapper.map(user, UserDTO.class);

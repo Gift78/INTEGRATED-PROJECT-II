@@ -7,11 +7,11 @@ import java.lang.annotation.*;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target({ElementType.FIELD})
+@Target({ElementType.TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = UniqueValidator.class)
-public @interface ValidUnique {
-    String message() default "must be unique";
+@Constraint(validatedBy = OnCreateUniqueValidator.class)
+public @interface ValidUniqueOnCreate {
+    String message() default "does not unique";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
