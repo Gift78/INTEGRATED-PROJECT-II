@@ -9,13 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.utils.UserRole;
-import sit.int221.validators.ValidUniqueOnUpdate;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ValidUniqueOnUpdate
 public class UpdateUserDTO {
     @NotBlank
     @Size(max = 45, message = "size must be between 1 and 45")

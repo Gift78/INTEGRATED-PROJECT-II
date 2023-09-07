@@ -30,4 +30,25 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(UsernameNotUniqueException.class)
+    public ResponseEntity<ErrorResponse> handleUsernameNotUniqueException(UsernameNotUniqueException ex, WebRequest webRequest){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
+        errorResponse.addValidationError("username","does not unique");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(NameNotUniqueException.class)
+    public ResponseEntity<ErrorResponse> handleNameNotUniqueException(NameNotUniqueException ex, WebRequest webRequest){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
+        errorResponse.addValidationError("name","does not unique");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(EmailNotUniqueException.class)
+    public ResponseEntity<ErrorResponse> handleEmailNotUniqueException(EmailNotUniqueException ex, WebRequest webRequest){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
+        errorResponse.addValidationError("email","does not unique");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }
