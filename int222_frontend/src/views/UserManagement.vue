@@ -15,16 +15,23 @@ const name = ref('');
 const email = ref('');
 const role = ref('announcer');
 
+
+const isEmailValid = computed(() => {
+    const emailRegex = /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
+    return emailRegex.test(email.value);
+});
+
+
 onMounted(async () => {
     if (params?.id) {
         user.value = await getUserById(params?.id);
 
         if (user.value === undefined || user.value === null) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Sorry, the request page is not available',
-            confirmButtonColor: '#155e75',
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Sorry, the request page is not available',
+                confirmButtonColor: '#155e75',
             }).then(() => {
                 router.push({ name: 'UserListing' })
             })
@@ -63,6 +70,17 @@ const AddEditUser = async () => {
         role: role.value
     }
 
+    if (!isEmailValid.value) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Email',
+            text: 'Please enter a valid email address.',
+            confirmButtonColor: '#155e75',
+        });
+        return;
+    }
+    
+    
     if (isSubmitAllowed.value !== true) {
         toastMixin.fire({
             icon: 'error',
@@ -180,22 +198,32 @@ const toastMixin = Swal.mixin({
                 <div class="w-1/6">
                 </div>
                 <div class="w-5/6 my-32 py-12 px-32 mx-32 flex flex-col bg-white rounded-2xl shadow-2xl">
-                    <div class="text-4xl mt-4">User Detail:</div>
+                    <div class="text-4xl mt-4 ">User Detail:</div>
                     <div class="my-4">
-                        <div class="text-lg text-black mt-4">Username</div>
-                        <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="username">
-                        <div class="text-lg text-black mt-4">Name</div>
-                        <input type="text" class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="name" maxlength="100">
-                        <div class="text-lg text-black mt-4">Email</div>
-                        <input type="email" class="ann-email border rounded-lg mt-3 pl-3 w-full h-12 bg-white" v-model.trim="email" maxlength="150">
-                        <div class="text-lg text-black mt-4">Role</div>
+                        <div class="text-lg mt-4 text-cyan-800">Username</div>
+                        <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                            v-model.trim="username" maxlength="45">
+                        <span class="px-4 mb-2 flex flex-col items-end">({{ username.length }}/45)</span>
+                        <div class="text-lg text-cyan-800 mt-4">Name</div>
+                        <input type="text" class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                            v-model.trim="name" maxlength="100">
+                        <span class="px-4 mb-2 flex flex-col items-end">({{ name.length }}/100)</span>
+                        <div class="text-lg text-cyan-800 mt-4">Email</div>
+                        <input type="email" class="ann-email border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                            v-model.trim="email" maxlength="150">
+                        <div v-if="!isEmailValid && email !== ''" class="text-red-500">
+                            Email must be a well-formed email address*
+                        </div>
+                        <span class="px-4 mb-2 flex flex-col items-end">({{ email.length }}/150)</span>
+
+                        <div class="text-lg text-cyan-800 mt-4">Role</div>
                         <select class="ann-role select select-bordered bg-white mt-3" v-model="role">
                             <option>admin</option>
                             <option>announcer</option>
                         </select>
                         <div class="flex mt-4" v-if="!isAddUserPage">
                             <div class="mr-10">
-                                <span class="font-bold mr-3">Created On</span>  
+                                <span class="font-bold mr-3">Created On</span>
                                 <p class="ann-created-on">{{ formatDatetimeLocal(user.createdOn) }}</p>
                             </div>
                             <div>
@@ -204,13 +232,13 @@ const toastMixin = Swal.mixin({
                             </div>
                         </div>
                         <div class="flex mt-4">
-                            <button 
+                            <button
                                 class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg"
                                 :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
                                 @click="AddEditUser()">
                                 Save
                             </button>
-                            <button 
+                            <button
                                 class="text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg hover:scale-110 w-28 h-12 ml-5 rounded-lg"
                                 @click="showBackButtonConfirmation()">
                                 Cancel
