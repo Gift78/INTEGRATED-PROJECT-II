@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.List;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -31,24 +33,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(UsernameNotUniqueException.class)
-    public ResponseEntity<ErrorResponse> handleUsernameNotUniqueException(UsernameNotUniqueException ex, WebRequest webRequest){
+    @ExceptionHandler(NotUniqueOnUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleNotUniqueOnUpdateException(NotUniqueOnUpdateException ex, WebRequest webRequest){
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
-        errorResponse.addValidationError("username","does not unique");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-    @ExceptionHandler(NameNotUniqueException.class)
-    public ResponseEntity<ErrorResponse> handleNameNotUniqueException(NameNotUniqueException ex, WebRequest webRequest){
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
-        errorResponse.addValidationError("name","does not unique");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-    @ExceptionHandler(EmailNotUniqueException.class)
-    public ResponseEntity<ErrorResponse> handleEmailNotUniqueException(EmailNotUniqueException ex, WebRequest webRequest){
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
-        errorResponse.addValidationError("email","does not unique");
+        List<String> fieldError = ex.getFieldError();
+        for (String field : fieldError) {
+            errorResponse.addValidationError(field,"does not unique");
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

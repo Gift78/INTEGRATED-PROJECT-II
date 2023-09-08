@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.dtos.UpdateUserDTO;
 import sit.int221.entities.User;
-import sit.int221.exceptions.EmailNotUniqueException;
-import sit.int221.exceptions.NameNotUniqueException;
-import sit.int221.exceptions.UserNotFoundException;
-import sit.int221.exceptions.UsernameNotUniqueException;
+import sit.int221.exceptions.*;
 import sit.int221.repositories.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,35 +49,48 @@ public class UserService {
         return userRepository.saveAndFlush(newUser);
     }
 
-    public User updateUser(Integer userId,UpdateUserDTO userDetail){
+    public User updateUser(Integer userId, UpdateUserDTO userDetail){
         String trimmedName = userDetail.getName().trim();
         String trimmedUsername = userDetail.getUsername().trim();
         String trimmedEmail = userDetail.getEmail().trim();
         User existUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        if (!trimmedUsername.equals(existUser.getUsername())) {
-            User duplicateUsername = userRepository.findByUsername(trimmedUsername);
-            if (duplicateUsername != null){
-                throw new UsernameNotUniqueException();
-            }
-        }
-        if (!trimmedName.equals(existUser.getName())){
-            User duplicateName = userRepository.findByName(trimmedName);
-            if (duplicateName != null){
-                throw new NameNotUniqueException();
-            }
-        }
-        if (!trimmedEmail.equals(existUser.getEmail())){
-            User duplicateEmail = userRepository.findByEmail(trimmedEmail);
-            if (duplicateEmail != null){
-                throw new EmailNotUniqueException();
-            }
-        }
+
+        validateUniqueOnUpdate(existUser, trimmedUsername, trimmedName, trimmedEmail);
 
         existUser.setName(trimmedName);
         existUser.setUsername(trimmedUsername);
         existUser.setEmail(trimmedEmail);
         existUser.setRole(userDetail.getRole());
         return userRepository.saveAndFlush(existUser);
+    }
+
+    private void validateUniqueOnUpdate(User existUser, String trimmedUsername, String trimmedName, String trimmedEmail){
+        List<String> fieldError = new ArrayList<>();
+
+        if (!trimmedUsername.equals(existUser.getUsername())) {
+            User duplicateUsername = userRepository.findByUsername(trimmedUsername);
+            if (duplicateUsername != null){
+                fieldError.add("username");
+            }
+        }
+
+        if (!trimmedName.equals(existUser.getName())){
+            User duplicateName = userRepository.findByName(trimmedName);
+            if (duplicateName != null){
+                fieldError.add("name");
+            }
+        }
+
+        if (!trimmedEmail.equals(existUser.getEmail())){
+            User duplicateEmail = userRepository.findByEmail(trimmedEmail);
+            if (duplicateEmail != null){
+                fieldError.add("email");
+            }
+        }
+
+        if (!fieldError.isEmpty()){
+            throw new NotUniqueOnUpdateException(fieldError);
+        }
     }
 
     public void deleteUser(Integer id) {
