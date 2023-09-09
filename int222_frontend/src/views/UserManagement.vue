@@ -15,6 +15,9 @@ const name = ref('');
 const email = ref('');
 const role = ref('announcer');
 
+const usernameError = ref("")
+const nameError = ref("")
+const emailError = ref("")
 
 const isEmailValid = computed(() => {
     const emailRegex = /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
@@ -62,7 +65,11 @@ const showBackButtonConfirmation = () => {
     })
 }
 
+
 const AddEditUser = async () => {
+    usernameError.value = ""
+    nameError.value = ""
+    emailError.value = ""
     const data = {
         username: username.value,
         name: name.value,
@@ -79,8 +86,8 @@ const AddEditUser = async () => {
         });
         return;
     }
-    
-    
+
+
     if (isSubmitAllowed.value !== true) {
         toastMixin.fire({
             icon: 'error',
@@ -109,6 +116,18 @@ const AddEditUser = async () => {
             })
         } else {
             const errorData = await response.json();
+            for (const detail of errorData?.detail) {
+                if (detail.field === "username") {
+                    usernameError.value = detail?.errorMessage
+                }
+                if (detail.field === "name") {
+                    nameError.value = detail?.errorMessage
+                }
+                if (detail.field === "email") {
+                    emailError.value = detail?.errorMessage
+                }
+
+            }
             Swal.fire({
                 icon: 'error',
                 title: 'Error ' + errorData.status,
@@ -136,6 +155,18 @@ const AddEditUser = async () => {
             })
         } else {
             const errorData = await response.json();
+            for (const detail of errorData?.detail) {
+                if (detail.field === "username") {
+                    usernameError.value = detail?.errorMessage
+                }
+                if (detail.field === "name") {
+                    nameError.value = detail?.errorMessage
+                }
+                if (detail.field === "email") {
+                    emailError.value = detail?.errorMessage
+                }
+
+            }
             Swal.fire({
                 icon: 'error',
                 title: 'Error ' + errorData.status,
@@ -203,18 +234,38 @@ const toastMixin = Swal.mixin({
                         <div class="text-lg mt-4 text-cyan-800">Username</div>
                         <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                             v-model.trim="username" maxlength="45">
-                        <span class="px-4 mb-2 flex flex-col items-end">({{ username.length }}/45)</span>
+                        <!-- for error and length -->
+                        <div class="flex justify-between">
+                            <span class="px-4 text-red-500">{{ usernameError }}</span>
+                            <span class="px-4">({{ username.length }}/45)</span>
+                        </div>
+
                         <div class="text-lg text-cyan-800 mt-4">Name</div>
                         <input type="text" class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                             v-model.trim="name" maxlength="100">
-                        <span class="px-4 mb-2 flex flex-col items-end">({{ name.length }}/100)</span>
+                        <!-- for error and length -->
+                        <div class="flex justify-between">
+                            <span class="px-4">{{ nameError }}</span>
+                            <span class="px-4">({{ name.length }}/100)</span>
+                        </div>
+
                         <div class="text-lg text-cyan-800 mt-4">Email</div>
                         <input type="email" class="ann-email border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                             v-model.trim="email" maxlength="150">
-                        <div v-if="!isEmailValid && email !== ''" class="text-red-500">
-                            Email must be a well-formed email address*
+                        <!-- for error and length -->
+                        <div class="flex justify-between">
+                            <div class="flex flex-col">
+                                <span v-if="!isEmailValid && email !== ''" class="text-red-500 pl-3">
+                                    Email must be a well-formed email address*
+                                </span>
+                                <span class="text-red-500 pl-3">{{ emailError }}</span>
+                            </div>
+                            <span class="px-4">({{ email.length }}/150)</span>
                         </div>
-                        <span class="px-4 mb-2 flex flex-col items-end">({{ email.length }}/150)</span>
+                        <!-- errorUnique.value?.detail[0] -->
+
+
+                        <span></span>
 
                         <div class="text-lg text-cyan-800 mt-4">Role</div>
                         <select class="ann-role select select-bordered bg-white mt-3" v-model="role">
