@@ -7,6 +7,8 @@ import AddEditAnnouncement from "../views/AddEditAnnouncement.vue"
 import UserListing from "../views/UserListing.vue"
 import UserManagement from "../views/UserManagement.vue"
 import NotFound from "../views/NotFound.vue"
+import UserMatchPassword from "../views/UserMatchPassword.vue"
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,10 +63,16 @@ const router = createRouter({
       component: UserManagement,
     },
     {
+      path: "/admin/user/match",
+      name: "UserMatchPassword",
+      component: UserMatchPassword,
+    },
+    {
       path: "/:notfoundpath(.*)",
       name: "NotFound",
       component: NotFound,
     },
+    
   ],
 });
 
