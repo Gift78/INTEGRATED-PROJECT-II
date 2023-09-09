@@ -155,6 +155,18 @@ const AddEditUser = async () => {
             })
         } else {
             const errorData = await response.json();
+            for (const detail of errorData?.detail) {
+                if (detail.field === "username") {
+                    usernameError.value = detail?.errorMessage
+                }
+                if (detail.field === "name") {
+                    nameError.value = detail?.errorMessage
+                }
+                if (detail.field === "email") {
+                    emailError.value = detail?.errorMessage
+                }
+
+            }
             Swal.fire({
                 icon: 'error',
                 title: 'Error ' + errorData.status,
