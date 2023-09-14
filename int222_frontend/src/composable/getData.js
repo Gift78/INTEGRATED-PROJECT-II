@@ -6,14 +6,6 @@ const getAllData = async (mode) => {
     if (res.ok) {
       const data = await res.json();
       return data;
-    } else if (res.status === 404) {
-      throw new Error("404 Not Found");
-    } else if (res.status === 500) {
-      throw new Error("500 Internal Server Error");
-    } else if (res.status === 503) {
-      throw new Error("503 Service Unavailable");
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
@@ -28,16 +20,11 @@ const getDataById = async (id, isCount) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-      "/api/announcements/" +
-      id +
-      "?count=" +
-      isCount
+      "/api/announcements/" + id + "?count=" + isCount
     );
     if (res.ok) {
       const data = await res.json();
       return data;
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
@@ -50,14 +37,6 @@ const getAllCategories = async () => {
     if (res.ok) {
       const categories = await res.json();
       return categories;
-    } else if (res.status === 404) {
-      throw new Error("404 Not Found");
-    } else if (res.status === 500) {
-      throw new Error("500 Internal Server Error");
-    } else if (res.status === 503) {
-      throw new Error("503 Service Unavailable");
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
@@ -71,19 +50,12 @@ const getCategoryById = async (id) => {
     if (res.ok) {
       const category = await res.json();
       return category;
-    } else if (res.status === 404) {
-      throw new Error("404 Not Found");
-    } else if (res.status === 500) {
-      throw new Error("500 Internal Server Error");
-    } else if (res.status === 503) {
-      throw new Error("503 Service Unavailable");
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
   }
 };
+
 const getDataByPage = async (mode, page, size) => {
   try {
     const res = await fetch(
@@ -93,14 +65,6 @@ const getDataByPage = async (mode, page, size) => {
     if (res.ok) {
       const data = await res.json();
       return data;
-    } else if (res.status === 404) {
-      throw new Error("404 Not Found");
-    } else if (res.status === 500) {
-      throw new Error("500 Internal Server Error");
-    } else if (res.status === 503) {
-      throw new Error("503 Service Unavailable");
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
@@ -116,14 +80,6 @@ const getAnnoucementPageByCategoryId = async (mode, page, size, catId) => {
     if (res.ok) {
       const data = await res.json();
       return data;
-    } else if (res.status === 404) {
-      throw new Error("404 Not Found");
-    } else if (res.status === 500) {
-      throw new Error("500 Internal Server Error");
-    } else if (res.status === 503) {
-      throw new Error("503 Service Unavailable");
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
@@ -136,14 +92,6 @@ const getAllUsers = async () => {
     if (res.ok) {
       const users = await res.json();
       return users;
-    } else if (res.status === 404) {
-      throw new Error("404 Not Found");
-    } else if (res.status === 500) {
-      throw new Error("500 Internal Server Error");
-    } else if (res.status === 503) {
-      throw new Error("503 Service Unavailable");
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
@@ -159,8 +107,6 @@ const getUserById = async (id) => {
     if (res.ok) {
       const data = await res.json();
       return data;
-    } else {
-      throw new Error("Something went wrong.");
     }
   } catch (err) {
     console.log(err);
