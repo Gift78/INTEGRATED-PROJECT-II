@@ -14,16 +14,18 @@ const username = ref('');
 const name = ref('');
 const email = ref('');
 const role = ref('announcer');
+const password = ref('')
+const confirmPass = ref('')
 
 const usernameError = ref("")
 const nameError = ref("")
 const emailError = ref("")
+const passwordError = ref("")
 
 const isEmailValid = computed(() => {
     const emailRegex = /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
     return emailRegex.test(email.value);
 });
-
 
 onMounted(async () => {
     if (params?.id) {
@@ -70,6 +72,7 @@ const AddEditUser = async () => {
     usernameError.value = ""
     nameError.value = ""
     emailError.value = ""
+    passwordError.value = ""
     const data = {
         username: username.value,
         name: name.value,
@@ -86,7 +89,6 @@ const AddEditUser = async () => {
         });
         return;
     }
-
 
     if (isSubmitAllowed.value !== true) {
         toastMixin.fire({
@@ -136,12 +138,20 @@ const AddEditUser = async () => {
             })
         }
     } else {
+        const newData = {
+            username: username.value,
+            name: name.value,
+            email: email.value,
+            role: role.value,
+            password: password.value
+        }
+        validPassword()
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(newData)
         })
 
         if (response.ok) {
@@ -155,6 +165,7 @@ const AddEditUser = async () => {
             })
         } else {
             const errorData = await response.json();
+            console.log(errorData)
             for (const detail of errorData?.detail) {
                 if (detail.field === "username") {
                     usernameError.value = detail?.errorMessage
@@ -165,7 +176,9 @@ const AddEditUser = async () => {
                 if (detail.field === "email") {
                     emailError.value = detail?.errorMessage
                 }
-
+                if (detail.field === "password") {
+                    passwordError.value = detail?.errorMessage
+                }
             }
             Swal.fire({
                 icon: 'error',
@@ -207,6 +220,15 @@ const isEmpty = computed(() => {
     }
 })
 
+const matchPassword = ref(true)
+const validPassword = () => {
+    if (password.value !== confirmPass.value) {
+        matchPassword.value = false
+    } else {
+        matchPassword.value = true
+    }
+}
+
 const toastMixin = Swal.mixin({
     toast: true,
     icon: 'error',
@@ -228,7 +250,7 @@ const toastMixin = Swal.mixin({
                 </div>
                 <div class="w-1/6">
                 </div>
-                <div class="w-5/6 my-32 py-12 px-32 mx-32 flex flex-col bg-white rounded-2xl shadow-2xl">
+                <div class="w-5/6 my-8 py-12 px-32 mx-32 flex flex-col bg-white rounded-2xl shadow-2xl">
                     <div class="text-4xl mt-4 ">User Detail:</div>
                     <div class="my-4">
                         <div class="text-lg mt-4 text-cyan-800">Username</div>
@@ -240,12 +262,31 @@ const toastMixin = Swal.mixin({
                             <span class="px-4">({{ username.length }}/45)</span>
                         </div>
 
+                        <!-- password field -->
+                        <div v-if="isAddUserPage">
+                            <div class="text-lg mt-4 text-cyan-800">Password</div>
+                            <input type="password" class="ann-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                                minlength="8" maxlength="14" v-model="password">
+                            <!-- for error and length -->
+                            <div class="px-4 text-red-500" v-if="passwordError !== ''">
+                                {{ passwordError }}</div>
+
+                            <div class="text-lg mt-4 text-cyan-800">Confirm Password</div>
+                            <input type="password"
+                                class="ann-confirm-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white" minlength="8"
+                                maxlength="14" v-model="confirmPass">
+                            <!-- for error and length -->
+                            <div class="px-4 text-red-500" v-if="!matchPassword">The confirm password confirmation does not
+                                match.</div>
+                        </div>
+
+
                         <div class="text-lg text-cyan-800 mt-4">Name</div>
                         <input type="text" class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                             v-model.trim="name" maxlength="100">
                         <!-- for error and length -->
                         <div class="flex justify-between">
-                            <span class="px-4">{{ nameError }}</span>
+                            <span class="px-4 text-red-500">{{ nameError }}</span>
                             <span class="px-4">({{ name.length }}/100)</span>
                         </div>
 
