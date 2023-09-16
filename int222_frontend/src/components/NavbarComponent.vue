@@ -39,6 +39,8 @@ const goToPage = (pageName) => {
             <hr>
             <button class="ann-menu py-5 w-full text-left pl-14 bg-white hover:bg-emerald-100" @click="goToPage('UserListing')">User</button>
             <hr>
+            <button class="ann-menu py-5 w-full text-left pl-14 bg-white hover:bg-emerald-100" @click="goToPage('UserMatchPassword')">Match Password</button>
+            <hr>
         </div>
     </div>
 </template>
