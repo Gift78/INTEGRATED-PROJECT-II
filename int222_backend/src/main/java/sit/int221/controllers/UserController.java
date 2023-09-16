@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.dtos.UpdateUserDTO;
 import sit.int221.dtos.UserDTO;
+import sit.int221.dtos.UserMatchDTO;
 import sit.int221.entities.User;
 import sit.int221.services.UserService;
 
@@ -56,5 +57,10 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
+    }
+
+    @PostMapping("/match")
+    public boolean checkMatch(@RequestBody UserMatchDTO userMatchDTO){
+        return userService.checkMatch(userMatchDTO);
     }
 }
