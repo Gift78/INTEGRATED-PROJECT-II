@@ -7,6 +7,7 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.dtos.UpdateUserDTO;
+import sit.int221.dtos.UserMatchDTO;
 import sit.int221.entities.User;
 import sit.int221.exceptions.*;
 import sit.int221.repositories.UserRepository;
@@ -21,7 +22,7 @@ public class UserService {
     @Autowired
     private ModelMapper modelMapper;
 
-
+    private Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16,32,1,4096,3);
 
     public List<User> getAllUser(){
         Sort sortRoleAndUsername = Sort.by(Sort.Direction.ASC, "role", "username");
@@ -96,5 +97,16 @@ public class UserService {
     public void deleteUser(Integer id) {
         User existUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         userRepository.delete(existUser);
+    }
+
+    public boolean checkMatch(UserMatchDTO userMatchDTO ) {
+        User user = userRepository.findByUsername(userMatchDTO.getUsername());
+        if (user == null) {
+            throw new UnauthorizedException("User with username " + userMatchDTO.getUsername() + " not found.");
+        }else if(argon2PasswordEncoder.matches(userMatchDTO.getPassword(),user.getPassword())){
+            return true;
+        }else{
+            throw new UnauthorizedException("Password is not match");
+        }
     }
 }
