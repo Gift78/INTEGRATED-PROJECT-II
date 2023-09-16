@@ -30,4 +30,15 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(NotUniqueOnUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleNotUniqueOnUpdateException(NotUniqueOnUpdateException ex, WebRequest webRequest){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
+        List<String> fieldError = ex.getFieldError();
+        for (String field : fieldError) {
+            errorResponse.addValidationError(field, "does not unique");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }
