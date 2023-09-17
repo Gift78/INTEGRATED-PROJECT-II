@@ -67,7 +67,6 @@ const showBackButtonConfirmation = () => {
     })
 }
 
-
 const AddEditUser = async () => {
     usernameError.value = ""
     nameError.value = ""
@@ -146,6 +145,9 @@ const AddEditUser = async () => {
             password: password.value
         }
         validPassword()
+        if (!matchPassword.value) {
+            return;
+        }
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users", {
             method: 'POST',
             headers: {
