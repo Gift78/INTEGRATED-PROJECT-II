@@ -8,4 +8,8 @@ public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(Integer id) {
         super("User id " + id + " does not exist!.");
     }
+
+    public UserNotFoundException(String username) {
+        super("User " + username + " does not exist!.");
+    }
 }
