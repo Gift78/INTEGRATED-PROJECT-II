@@ -30,8 +30,6 @@ const matchPassword = async () => {
         }
     }
 }
-
-
 </script>
 <template>
     <div class="w-full h-screen bg-slate-100 items-center">
