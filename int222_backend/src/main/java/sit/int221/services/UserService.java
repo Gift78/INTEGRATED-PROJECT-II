@@ -22,8 +22,6 @@ public class UserService {
     @Autowired
     private ModelMapper modelMapper;
 
-    private Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16,32,1,4096,3);
-
     public List<User> getAllUser(){
         Sort sortRoleAndUsername = Sort.by(Sort.Direction.ASC, "role", "username");
         return userRepository.findAll(sortRoleAndUsername);
@@ -101,11 +99,13 @@ public class UserService {
 
     public boolean checkMatch(UserMatchDTO userMatchDTO ) {
         User user = userRepository.findByUsername(userMatchDTO.getUsername());
+        Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16, 32, 1, 4096, 3);
+
         if (user == null) {
-            throw new UnauthorizedException("User with username " + userMatchDTO.getUsername() + " not found.");
-        }else if(argon2PasswordEncoder.matches(userMatchDTO.getPassword(),user.getPassword())){
+            throw new UserNotFoundException(userMatchDTO.getUsername());
+        } else if (argon2PasswordEncoder.matches(userMatchDTO.getPassword(),user.getPassword())){
             return true;
-        }else{
+        } else {
             throw new UnauthorizedException("Password is not match");
         }
     }
