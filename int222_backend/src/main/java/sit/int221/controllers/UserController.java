@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.dtos.UpdateUserDTO;
 import sit.int221.dtos.UserDTO;
+import sit.int221.dtos.UserMatchDTO;
 import sit.int221.entities.User;
 import sit.int221.services.UserService;
 
@@ -16,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = {"http://localhost:5173", "http://intproj22.sit.kmutt.ac.th"})
+@CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
 public class UserController {
     @Autowired
     private UserService userService;
@@ -46,7 +47,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @Transactional
-    public UserDTO updateUser(@PathVariable Integer userId, @RequestBody UpdateUserDTO userDetail) {
+    public UserDTO updateUser(@PathVariable Integer userId, @Valid @RequestBody UpdateUserDTO userDetail) {
         User user = userService.updateUser(userId,userDetail);
         entityManager.refresh(user);
 
@@ -56,5 +57,10 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
+    }
+
+    @PostMapping("/match")
+    public boolean checkMatch(@RequestBody UserMatchDTO userMatchDTO){
+        return userService.checkMatch(userMatchDTO);
     }
 }

@@ -3,7 +3,7 @@ import UserAnnouncement from "../views/UserAnnouncement.vue"
 import UserAnnouncementDetail from "../views/UserAnnouncementDetail.vue"
 import AdminAnnouncement from "../views/AdminAnnouncement.vue"
 import AdminAnnouncementDetail from "../views/AdminAnnouncementDetail.vue"
-import AddEditAnnouncement from "../views/AddEditAnnouncement.vue"
+import AnnouncementManagement from "../views/AnnouncementManagement.vue"
 import UserListing from "../views/UserListing.vue"
 import UserManagement from "../views/UserManagement.vue"
 import NotFound from "../views/NotFound.vue"
@@ -30,12 +30,12 @@ const router = createRouter({
     {
       path: "/admin/announcement/add",
       name: "AddAnnouncement",
-      component: AddEditAnnouncement,
+      component: AnnouncementManagement,
     },
     {
       path: "/admin/announcement/:id/edit",
       name: "EditAnnouncement",
-      component: AddEditAnnouncement,
+      component: AnnouncementManagement,
     },
     {
       path: "/announcement",

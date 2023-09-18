@@ -168,7 +168,6 @@ const AddEditUser = async () => {
             })
         } else {
             const errorData = await response.json();
-            console.log(errorData)
             for (const detail of errorData?.detail) {
                 if (detail.field === "username") {
                     usernameError.value = detail?.errorMessage

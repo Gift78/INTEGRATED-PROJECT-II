@@ -1,16 +1,13 @@
 <script setup>
 import NavbarComponent from '../components/NavbarComponent.vue';
-import { useRoute } from 'vue-router';
-import { ref, onMounted, computed } from 'vue';
+import { ref } from 'vue';
 
-const params = useRoute().params
 const username = ref('')
 const password = ref('')
 const matchMsg = ref('')
 
 const matchPassword = async () => {
     matchMsg.value = ''
-    console.log(password.value)
     const data = {
         username: username.value,
         password: password.value
@@ -34,8 +31,6 @@ const matchPassword = async () => {
         }
     }
 }
-
-
 </script>
 <template>
     <div class="w-full h-screen bg-slate-100 items-center">
@@ -77,10 +72,7 @@ const matchPassword = async () => {
                         </button>
                     </div>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 </template>
