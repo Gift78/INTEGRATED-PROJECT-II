@@ -25,7 +25,13 @@ const passwordError = ref("")
 const isEmailValid = computed(() => {
     const emailRegex = /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
     return emailRegex.test(email.value);
+
 });
+
+const isPasswordValid = computed(() => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W_]).+$/
+    return passwordRegex.test(password.value)
+})
 
 onMounted(async () => {
     if (params?.id) {
@@ -67,6 +73,7 @@ const showBackButtonConfirmation = () => {
     })
 }
 
+
 const AddEditUser = async () => {
     usernameError.value = ""
     nameError.value = ""
@@ -80,12 +87,6 @@ const AddEditUser = async () => {
     }
 
     if (!isEmailValid.value) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Email',
-            text: 'Please enter a valid email address.',
-            confirmButtonColor: '#155e75',
-        });
         return;
     }
 
@@ -145,7 +146,7 @@ const AddEditUser = async () => {
             password: password.value
         }
         validPassword()
-        if (!matchPassword.value) {
+        if (matchPassword.value !== true) {
             return;
         }
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users", {
@@ -178,15 +179,13 @@ const AddEditUser = async () => {
                     emailError.value = detail?.errorMessage
                 }
                 if (detail.field === "password") {
-                    passwordError.value = detail?.errorMessage
+                    if (password.value.length < 8 || password.length > 14) {
+                        passwordError.value = 'Password size must be between 8 and 14'
+                    } else if (isPasswordValid) {
+                        passwordError.value = 'must be 8-14 characters long, at least 1 of uppercase, lowercase, number and special characters'
+                    }
                 }
             }
-            Swal.fire({
-                icon: 'error',
-                title: 'Error ' + errorData.status,
-                text: errorData.message,
-                confirmButtonColor: '#155e75',
-            })
         }
     }
 }
@@ -255,44 +254,45 @@ const toastMixin = Swal.mixin({
                     <div class="text-4xl mt-4 ">User Detail:</div>
                     <div class="my-4">
                         <div class="text-lg mt-4 text-cyan-800">Username</div>
-                        <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                        <input type="text" required class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                             v-model.trim="username" maxlength="45">
                         <!-- for error and length -->
                         <div class="flex justify-between">
-                            <span class="px-4 text-red-500">{{ usernameError }}</span>
+                            <span v-if="username == '' || usernameError !== ''"
+                                class="ann-error-username px-4 text-red-500">{{
+                                    usernameError }}</span>
                             <span class="px-4">({{ username.length }}/45)</span>
                         </div>
 
                         <!-- password field -->
                         <div v-if="isAddUserPage">
                             <div class="text-lg mt-4 text-cyan-800">Password</div>
-                            <input type="password" class="ann-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
-                                minlength="8" maxlength="14" v-model="password">
+                            <input type="password" required
+                                class="ann-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white" minlength="8"
+                                maxlength="14" v-model.trim="password">
                             <!-- for error and length -->
-                            <div class="px-4 text-red-500" v-if="passwordError !== ''">
+                            <div class="ann-error-password px-4 text-red-500" v-if="passwordError !== ''">
                                 {{ passwordError }}</div>
+                            <div class="ann-error-password px-4 text-red-500" v-if="!matchPassword">The password DOES NOT match</div>
 
                             <div class="text-lg mt-4 text-cyan-800">Confirm Password</div>
-                            <input type="password"
+                            <input type="password" required
                                 class="ann-confirm-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white" minlength="8"
-                                maxlength="14" v-model="confirmPass">
-                            <!-- for error and length -->
-                            <div class="px-4 text-red-500" v-if="!matchPassword">The confirm password confirmation does not
-                                match.</div>
+                                maxlength="14" v-model.trim="confirmPass">
                         </div>
 
 
                         <div class="text-lg text-cyan-800 mt-4">Name</div>
-                        <input type="text" class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                        <input type="text" required class="ann-name border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                             v-model.trim="name" maxlength="100">
                         <!-- for error and length -->
                         <div class="flex justify-between">
-                            <span class="px-4 text-red-500">{{ nameError }}</span>
+                            <span class="ann-error-name px-4 text-red-500">{{ nameError }}</span>
                             <span class="px-4">({{ name.length }}/100)</span>
                         </div>
 
                         <div class="text-lg text-cyan-800 mt-4">Email</div>
-                        <input type="email" class="ann-email border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                        <input type="email" required class="ann-email border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                             v-model.trim="email" maxlength="150">
                         <!-- for error and length -->
                         <div class="flex justify-between">
@@ -300,21 +300,16 @@ const toastMixin = Swal.mixin({
                                 <span v-if="!isEmailValid && email !== ''" class="text-red-500 pl-3">
                                     Email must be a well-formed email address*
                                 </span>
-                                <span class="text-red-500 pl-3">{{ emailError }}</span>
+                                <span class="ann-error-email text-red-500 pl-3">{{ emailError }}</span>
                             </div>
                             <span class="px-4">({{ email.length }}/150)</span>
                         </div>
-                        <!-- errorUnique.value?.detail[0] -->
-
-
-                        <span></span>
-
                         <div class="text-lg text-cyan-800 mt-4">Role</div>
                         <select class="ann-role select select-bordered bg-white mt-3" v-model="role">
                             <option>admin</option>
                             <option>announcer</option>
                         </select>
-                        <div class="flex mt-4" v-if="!isAddUserPage">
+                        <div class="flex mt-5" v-if="!isAddUserPage">
                             <div class="mr-10">
                                 <span class="font-bold mr-3">Created On</span>
                                 <p class="ann-created-on">{{ formatDatetimeLocal(user.createdOn) }}</p>
@@ -324,7 +319,7 @@ const toastMixin = Swal.mixin({
                                 <p class="ann-updated-on">{{ formatDatetimeLocal(user.updatedOn) }}</p>
                             </div>
                         </div>
-                        <div class="flex mt-4">
+                        <div class="flex mt-10">
                             <button
                                 class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg"
                                 :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
