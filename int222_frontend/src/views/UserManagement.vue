@@ -4,34 +4,23 @@ import { getUserById } from '../composable/getData.js'
 import { formatDatetimeLocal } from '../composable/formatDatetime';
 import { useRoute, useRouter } from 'vue-router';
 import Swal from 'sweetalert2'
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 
 const router = useRouter();
 const params = useRoute().params;
-const user = ref([]);
+const user = ref({});
 const isAddUserPage = ref(false);
 const username = ref('');
 const name = ref('');
 const email = ref('');
 const role = ref('announcer');
 const password = ref('')
-const confirmPass = ref('')
+const confirmPassword = ref('')
 
 const usernameError = ref("")
 const nameError = ref("")
 const emailError = ref("")
 const passwordError = ref("")
-
-const isEmailValid = computed(() => {
-    const emailRegex = /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
-    return emailRegex.test(email.value);
-
-});
-
-const isPasswordValid = computed(() => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W_]).+$/
-    return passwordRegex.test(password.value)
-})
 
 onMounted(async () => {
     if (params?.id) {
@@ -73,12 +62,7 @@ const showBackButtonConfirmation = () => {
     })
 }
 
-
 const AddEditUser = async () => {
-    usernameError.value = ""
-    nameError.value = ""
-    emailError.value = ""
-    passwordError.value = ""
     const data = {
         username: username.value,
         name: name.value,
@@ -86,15 +70,15 @@ const AddEditUser = async () => {
         role: role.value
     }
 
-    if (!isEmailValid.value) {
-        return;
-    }
-
     if (isSubmitAllowed.value !== true) {
         toastMixin.fire({
             icon: 'error',
             title: 'Please fill in all the fields',
         })
+        return;
+    }
+
+    if (!isEmailValid.value) {
         return;
     }
 
@@ -128,14 +112,7 @@ const AddEditUser = async () => {
                 if (detail.field === "email") {
                     emailError.value = detail?.errorMessage
                 }
-
             }
-            Swal.fire({
-                icon: 'error',
-                title: 'Error ' + errorData.status,
-                text: errorData.message,
-                confirmButtonColor: '#155e75',
-            })
         }
     } else {
         const newData = {
@@ -144,10 +121,6 @@ const AddEditUser = async () => {
             email: email.value,
             role: role.value,
             password: password.value
-        }
-        validPassword()
-        if (matchPassword.value !== true) {
-            return;
         }
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users", {
             method: 'POST',
@@ -190,12 +163,45 @@ const AddEditUser = async () => {
     }
 }
 
+watch(password, () => {
+    console.log(password.value)
+    if (!isPasswordSizeValid.value && password.value !== '') {
+        passwordError.value = 'Password size must be between 8 and 14'
+    } else if (!isPasswordValid.value && password.value !== '') {
+        passwordError.value = 'must be 8-14 characters long, at least 1 of uppercase, lowercase, number and special characters'
+    } else {
+        passwordError.value = ''
+    }
+})
+
 const isSubmitAllowed = computed(() => {
-    if (isSameValue.value === true || isEmpty.value === true) {
+    if (isSameValue.value === true || 
+        isEmpty.value === true || 
+        isPasswordMatch.value === false || 
+        isPasswordSizeValid.value === false || 
+        isPasswordValid.value === false) {
         return false;
     } else {
         return true;
     }
+})
+
+const isEmailValid = computed(() => {
+    const emailRegex = /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
+    return emailRegex.test(email.value);
+});
+
+const isPasswordValid = computed(() => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+$/
+    return (passwordRegex.test(password.value)) || !isAddUserPage.value;
+})
+
+const isPasswordSizeValid = computed(() => {
+    return (password.value.length >= 8 && password.value.length <= 14) || !isAddUserPage.value;
+})
+
+const isPasswordMatch = computed(() => {
+    return (password.value === confirmPassword.value) || !isAddUserPage.value;
 })
 
 const isSameValue = computed(() => {
@@ -220,15 +226,6 @@ const isEmpty = computed(() => {
     }
 })
 
-const matchPassword = ref(true)
-const validPassword = () => {
-    if (password.value !== confirmPass.value) {
-        matchPassword.value = false
-    } else {
-        matchPassword.value = true
-    }
-}
-
 const toastMixin = Swal.mixin({
     toast: true,
     icon: 'error',
@@ -241,6 +238,7 @@ const toastMixin = Swal.mixin({
     }
 });
 </script>
+
 <template>
     <div class="w-full h-screen bg-slate-100">
         <div class="flex flex-row w-full h-full">
@@ -273,12 +271,12 @@ const toastMixin = Swal.mixin({
                             <!-- for error and length -->
                             <div class="ann-error-password px-4 text-red-500" v-if="passwordError !== ''">
                                 {{ passwordError }}</div>
-                            <div class="ann-error-password px-4 text-red-500" v-if="!matchPassword">The password DOES NOT match</div>
+                            <div class="ann-error-password px-4 text-red-500" v-if="!isPasswordMatch && confirmPassword !== '' && password !== ''">The password DOES NOT match</div>
 
                             <div class="text-lg mt-4 text-cyan-800">Confirm Password</div>
                             <input type="password" required
                                 class="ann-confirm-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white" minlength="8"
-                                maxlength="14" v-model.trim="confirmPass">
+                                maxlength="14" v-model.trim="confirmPassword">
                         </div>
 
 
@@ -338,4 +336,5 @@ const toastMixin = Swal.mixin({
         </div>
     </div>
 </template>
+
 <style scoped></style>
