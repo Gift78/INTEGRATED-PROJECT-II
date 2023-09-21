@@ -33,8 +33,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Integer id){
-        return userService.getUser(id);
+    public UserDTO getUser(@PathVariable Integer id){
+        User user = userService.getUser(id);
+        return modelMapper.map(user, UserDTO.class);
     }
 
     @PostMapping("")

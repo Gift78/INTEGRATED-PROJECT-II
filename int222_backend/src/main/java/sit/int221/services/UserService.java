@@ -3,7 +3,7 @@ package sit.int221.services;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.dtos.UpdateUserDTO;
@@ -14,6 +14,7 @@ import sit.int221.repositories.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -21,6 +22,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<User> getAllUser(){
         Sort sortRoleAndUsername = Sort.by(Sort.Direction.ASC, "role", "username");
@@ -37,8 +40,7 @@ public class UserService {
         String trimmedEmail = user.getEmail().trim();
         String trimmedPassword = user.getPassword().trim();
 
-        Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16, 32, 1, 4096, 3);
-        String hashedPassword = argon2PasswordEncoder.encode(trimmedPassword);
+        String hashedPassword = passwordEncoder.encode(trimmedPassword);
 
         User newUser = modelMapper.map(user, User.class);
         newUser.setUsername(trimmedUsername);
@@ -67,8 +69,8 @@ public class UserService {
         List<String> fieldError = new ArrayList<>();
 
         if (!trimmedUsername.equals(existUser.getUsername())) {
-            User duplicateUsername = userRepository.findByUsername(trimmedUsername);
-            if (duplicateUsername != null){
+            Optional<User> duplicateUsername = userRepository.findByUsername(trimmedUsername);
+            if (duplicateUsername.isPresent()){
                 fieldError.add("username");
             }
         }
@@ -98,12 +100,11 @@ public class UserService {
     }
 
     public boolean checkMatch(UserMatchDTO userMatchDTO ) {
-        User user = userRepository.findByUsername(userMatchDTO.getUsername());
-        Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16, 32, 1, 4096, 3);
+        Optional<User> user = userRepository.findByUsername(userMatchDTO.getUsername());
 
-        if (user == null) {
+        if (user.isEmpty()) {
             throw new UserNotFoundException(userMatchDTO.getUsername());
-        } else if (argon2PasswordEncoder.matches(userMatchDTO.getPassword(),user.getPassword())){
+        } else if (passwordEncoder.matches(userMatchDTO.getPassword(), user.get().getPassword())) {
             return true;
         } else {
             throw new UnauthorizedException("Password is not match");
