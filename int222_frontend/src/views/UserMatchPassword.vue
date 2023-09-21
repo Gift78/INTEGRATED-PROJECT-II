@@ -66,7 +66,7 @@ const matchPassword = async () => {
                         v-model="password">
                     <div class="flex mt-20">
                         <button
-                            class="ann-button text-white bg-cyan-800 hover:bg-cyan-700 border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg"
+                            class="ann-button text-white bg-cyan-800 hover:bg-cyan-700 border-0 shadow-lg transition-colors duration-200 w-28 h-12 rounded-lg"
                             @click="matchPassword">
                             Match or Not
                         </button>

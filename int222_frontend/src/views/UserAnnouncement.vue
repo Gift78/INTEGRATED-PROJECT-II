@@ -124,7 +124,7 @@ const changePageButton = (page) => {
             </div>
             <div v-else>
                 <div v-for="(announcement, index) in data.content" :key="data.id"
-                    class="ann-item grid grid-cols-9 bg-white hover:bg-slate-100 my-5 py-7 h-20 rounded-xl shadow-md cursor-pointer"
+                    class="ann-item grid grid-cols-9 bg-white hover:bg-slate-100 transition-colors duration-200 my-5 py-7 h-20 rounded-xl shadow-md cursor-pointer"
                     @click="router.push({name: 'UserAnnouncementDetail', params: {id: announcement.id}})">
                     <div class="text-center"> {{ index + 1 + (currentPage * 5) }}</div>
                     <div class="ann-title underline overflow-hidden"
