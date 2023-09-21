@@ -8,6 +8,7 @@ import UserListing from "../views/UserListing.vue"
 import UserManagement from "../views/UserManagement.vue"
 import NotFound from "../views/NotFound.vue"
 import UserMatchPassword from "../views/UserMatchPassword.vue"
+import UserLogin from "../views/UserLogin.vue"
 
 
 const router = createRouter({
@@ -71,6 +72,11 @@ const router = createRouter({
       path: "/:notfoundpath(.*)",
       name: "NotFound",
       component: NotFound,
+    },
+    {
+      path: "/login",
+      name: "UserLogin",
+      component: UserLogin,
     },
     
   ],
