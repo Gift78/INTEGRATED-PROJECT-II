@@ -3,6 +3,7 @@ package sit.int221.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,8 +25,10 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/token/**")
-                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/token").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/announcements/pages").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/announcements/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/category").permitAll()
                         .anyRequest()
                         .authenticated()
                 )
