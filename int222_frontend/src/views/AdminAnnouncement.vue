@@ -72,9 +72,9 @@ const showDeleteModal = (id) => {
             <!-- time zone bar -->
             <div class="flex justify-between">
                 <TimezoneComponent />
-                <div class="ann-button text-center rounded-md text-white p-1 px-4 bg-emerald-plus hover:bg-emerald-light hover:scale-105 cursor-pointer"
+                <div class="ann-button text-center rounded-md text-white p-1 px-4 bg-emerald-plus hover:bg-emerald-light transition-colors duration-200 cursor-pointer"
                     @click="router.push({ name: 'AddAnnouncement' })">
-                    + Add Announcement
+                    Add Announcement
                 </div>
 
             </div>
@@ -118,13 +118,13 @@ const showDeleteModal = (id) => {
                     </div>
                     <div class="ann-views text-cyan-800 my-auto text-center">{{ announcement.viewCount }}</div>
                     <div class="flex ml-10 col-span-2">
-                        <div class="ann-button mx-2 text-cyan-400 my-auto text-center bg-cyan-100 hover:bg-cyan-200 hover:scale-110  rounded-lg pt-2 w-16 h-10 shadow-sm cursor-pointer"
+                        <div class="ann-button mx-2 text-cyan-400 my-auto text-center bg-cyan-100 hover:bg-cyan-200 transition-colors duration-200 rounded-lg pt-2 w-16 h-10 shadow-sm cursor-pointer"
                             @click="router.push({ name: 'AdminAnnouncementDetail', params: { id: announcement.id } })">
                             View
                         </div>
                         <!-- delete -->
                         <button
-                            class="ann-button mx-2 text-red-400 my-auto text-center bg-red-100 hover:bg-red-200 hover:scale-110  rounded-lg w-16 h-10 shadow-sm cursor-pointer"
+                            class="ann-button mx-2 text-red-400 my-auto text-center bg-red-100 hover:bg-red-200 transition-colors duration-200 rounded-lg w-16 h-10 shadow-sm cursor-pointer"
                             @click="showDeleteModal(announcement.id)">Delete</button>
                     </div>
                 </div>

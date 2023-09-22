@@ -315,13 +315,13 @@ const toastMixin = Swal.mixin({
             <!-- button -->
             <div class="flex justify-end mt-3 space-x-3 " v-if="announcement">
                 <button
-                    class="ann-button text-black bg-white text-center rounded-lg shadow-md cursor-pointer px-5 py-2 w-20 h-10"
+                    class="ann-button text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg transition-colors duration-300 w-28 h-12 ml-5 rounded-lg"
                     @click="showBackButtonConfirmation()">
                     Back
                 </button>
 
                 <button
-                    class="ann-button text-white bg-emerald-plus text-center rounded-lg shadow-md px-5 py-2 w-20 h-10 mb-24"
+                    class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg transition-colors duration-300 w-28 h-12 rounded-lg"
                     :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
                     :disabled="!isSubmitAllowed" @click="AddEditAnnouncement(announcement, params?.id)">
                     {{ isUpdatePage ? 'Update' : 'Add' }}

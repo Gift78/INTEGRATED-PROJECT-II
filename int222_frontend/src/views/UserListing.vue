@@ -71,7 +71,7 @@ const showDeleteModal = (id) => {
             <div class="flex justify-between">
                 <TimezoneComponent />
                 <button
-                    class="ann-button px-5 rounded-lg text-white bg-emerald-plus hover:bg-emerald-light hover:scale-110"
+                    class="ann-button px-5 rounded-lg text-white bg-emerald-plus hover:bg-emerald-light transition-colors duration-200"
                     @click="router.push({ name: 'AddUser' })">
                     Add User
                 </button>
@@ -102,10 +102,10 @@ const showDeleteModal = (id) => {
                 <div class="ann-updated-on my-auto text-center col-span-2">{{ formatDatetimeLocal(user.updatedOn) }}</div>
                 <div class="my-auto col-span-2 flex justify-center">
                     <button
-                        class="ann-button text-orange-400 bg-orange-100 hover:bg-orange-200 hover:scale-110  rounded-lg w-16 h-12 shadow-sm mx-2"
+                        class="ann-button text-orange-400 bg-orange-100 hover:bg-orange-200 transition-colors duration-200 rounded-lg w-16 h-12 shadow-sm mx-2"
                         @click="router.push({ name: 'UserDetail', params: { id: user.id } })">edit</button>
                     <button
-                        class="ann-button text-red-400 bg-red-100 hover:bg-red-200 hover:scale-110  rounded-lg w-16 h-12 shadow-sm mx-2"
+                        class="ann-button text-red-400 bg-red-100 hover:bg-red-200 transition-colors duration-200 rounded-lg w-16 h-12 shadow-sm mx-2"
                         @click="showDeleteModal(user.id)">delete</button>
                 </div>
             </div>
