@@ -39,10 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String username;
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            System.out.println("Authorization header is null or does not start with Bearer");
-            System.out.println("Method: " + request.getMethod());
-            System.out.println("URI: " + request.getRequestURI());
-            System.out.println("isPublicEndpoint: " + isPublicEndpoint(request.getMethod(), request.getRequestURI()));
             if (isPublicEndpoint(request.getMethod(), request.getRequestURI())) {
                 filterChain.doFilter(request, response);
                 return;
