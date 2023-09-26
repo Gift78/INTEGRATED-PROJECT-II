@@ -1,5 +1,6 @@
 package sit.int221.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,5 +36,30 @@ public class AuthenticationService {
         } catch (BadCredentialsException e) {
             throw new UnauthorizedException("Password does not match for username: " + request.getUsername());
         }
+    }
+
+    public AuthenticationResponseDTO refreshToken(String authorizationHeader) {
+        final String refreshToken;
+        final String username;
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Missing or invalid Authorization header");
+        }
+
+        try {
+            refreshToken = authorizationHeader.substring(7);
+            username = jwtService.extractUsername(refreshToken);
+
+            if (username != null) {
+                User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+                jwtService.isTokenValid(refreshToken, user);
+                String token = jwtService.generateToken(user);
+                return new AuthenticationResponseDTO(token, refreshToken);
+            }
+        } catch (ExpiredJwtException ex) {
+            throw new UnauthorizedException("Refresh token has expired");
+        }
+
+        throw new UnauthorizedException("Invalid refresh token");
     }
 }
