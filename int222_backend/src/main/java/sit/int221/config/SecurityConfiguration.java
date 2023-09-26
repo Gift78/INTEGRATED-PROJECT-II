@@ -22,6 +22,7 @@ public class SecurityConfiguration {
     private AuthenticationProvider authenticationProvider;
     private static final String[][] PUBLIC_ENDPOINTS = {
             { HttpMethod.POST.toString(), "/api/token" },
+            { HttpMethod.OPTIONS.toString(), "/**"}
     };
 
     public static boolean isPublicEndpoint(String method, String path) {
@@ -45,7 +46,6 @@ public class SecurityConfiguration {
                             request.anyRequest().authenticated();
                         }
                 )
-//                .authorizeHttpRequests(request -> request.anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
