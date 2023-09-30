@@ -5,7 +5,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.dtos.UpdateUserDTO;
@@ -22,14 +21,10 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
 @RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private ListMapper listMapper;
-    @Autowired
-    private EntityManager entityManager;
+    private final UserService userService;
+    private final ModelMapper modelMapper;
+    private final ListMapper listMapper;
+    private final EntityManager entityManager;
 
     @GetMapping
     public List<UserDTO> getAllUser(){

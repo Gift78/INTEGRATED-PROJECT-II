@@ -1,8 +1,8 @@
 package sit.int221.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,13 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/announcements")
 @CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
+@RequiredArgsConstructor
 public class AnnouncementController {
-    @Autowired
-    private AnnouncementService announcementService;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private ListMapper listMapper;
+    private final AnnouncementService announcementService;
+    private final ModelMapper modelMapper;
+    private final ListMapper listMapper;
 
     @GetMapping("")
     public List<AnnouncementDTO> getAllAnnouncement(@RequestParam(required = false) String mode) {
