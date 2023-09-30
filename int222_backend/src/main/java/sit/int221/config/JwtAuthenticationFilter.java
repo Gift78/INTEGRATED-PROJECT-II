@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import sit.int221.exceptions.ErrorResponse;
+import sit.int221.services.JwtService;
 
 import java.io.IOException;
 
@@ -24,7 +25,7 @@ import static sit.int221.config.SecurityConfiguration.isPublicEndpoint;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
-    private sit.int221.services.JwtService JwtService;
+    private JwtService jwtService;
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -58,12 +59,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         jwt = authorizationHeader.substring(7);
         try {
-            username = JwtService.extractUsername(jwt);
+            username = jwtService.extractUsername(jwt);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (JwtService.isTokenValid(jwt, userDetails)) {
+                if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
