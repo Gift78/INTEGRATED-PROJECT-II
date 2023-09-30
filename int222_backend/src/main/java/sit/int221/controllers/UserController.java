@@ -3,6 +3,7 @@ package sit.int221.controllers;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,24 +13,28 @@ import sit.int221.dtos.UserDTO;
 import sit.int221.dtos.UserMatchDTO;
 import sit.int221.entities.User;
 import sit.int221.services.UserService;
+import sit.int221.utils.ListMapper;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
+@RequiredArgsConstructor
 public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
     private ModelMapper modelMapper;
-
+    @Autowired
+    private ListMapper listMapper;
     @Autowired
     private EntityManager entityManager;
 
     @GetMapping
-    public List<User> getAllUser(){
-        return userService.getAllUser();
+    public List<UserDTO> getAllUser(){
+        List<User> users = userService.getAllUser();
+        return listMapper.mapList(users, UserDTO.class, modelMapper);
     }
 
     @GetMapping("/{id}")
