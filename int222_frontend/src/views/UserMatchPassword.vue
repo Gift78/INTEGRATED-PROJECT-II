@@ -15,6 +15,7 @@ const matchPassword = async () => {
     const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/match", {
         method: 'POST',
         headers: {
+            'Authorization': `Bearer ${localStorage.getItem("token")}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)

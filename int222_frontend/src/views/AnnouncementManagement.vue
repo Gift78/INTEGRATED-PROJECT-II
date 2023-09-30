@@ -151,6 +151,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements/" + id, {
             method: 'PUT',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -178,6 +179,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements", {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -236,7 +238,7 @@ const toastMixin = Swal.mixin({
 <template>
     <div class="w-full  text-cyan-800 flex">
         <div class="w-1/6 bg-white rounded-br-3xl rounded-tr-3xl fixed h-screen shadow-2xl">
-            <NavbarComponent :haveComfirmation="true"/>
+            <NavbarComponent :haveComfirmation="true" />
         </div>
         <div class="w-1/6"></div>
         <div class="w-5/6 py-10 px-20">

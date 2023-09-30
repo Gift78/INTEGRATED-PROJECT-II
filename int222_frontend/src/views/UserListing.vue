@@ -17,7 +17,10 @@ onMounted(async () => {
 const deleteUser = async (id) => {
     try {
         const res = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/" + id, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers:{
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
         })
         if (res.status === 200) {
             users.value = users.value.filter((user) => {
