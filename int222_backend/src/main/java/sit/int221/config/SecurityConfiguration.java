@@ -1,6 +1,6 @@
 package sit.int221.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,31 +11,43 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.AntPathMatcher;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthFilter;
-    @Autowired
-    private AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+    private static final String[][] PUBLIC_ENDPOINTS = {
+            { HttpMethod.POST.toString(), "/api/token" },
+            { HttpMethod.OPTIONS.toString(), "/**"}
+    };
+
+    public static boolean isPublicEndpoint(String method, String path) {
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
+        for (String[] endpoint : PUBLIC_ENDPOINTS) {
+            if (antPathMatcher.match(endpoint[1], path) && endpoint[0].equals(method)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.POST, "/api/token").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/announcements/pages").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/announcements/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/category").permitAll()
-                        .anyRequest()
-                        .authenticated()
+                .authorizeHttpRequests(request -> {
+                            for (String[] endpoint : PUBLIC_ENDPOINTS) {
+                                request.requestMatchers(HttpMethod.valueOf(endpoint[0]), endpoint[1]).permitAll();
+                            }
+                            request.anyRequest().authenticated();
+                        }
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }

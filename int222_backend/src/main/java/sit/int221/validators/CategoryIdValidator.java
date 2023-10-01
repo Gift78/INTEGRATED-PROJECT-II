@@ -2,14 +2,14 @@ package sit.int221.validators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sit.int221.repositories.CategoryRepository;
 
 @Component
+@RequiredArgsConstructor
 public class CategoryIdValidator implements ConstraintValidator<ValidCategoryId, Integer> {
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public boolean isValid(Integer categoryId, ConstraintValidatorContext constraintValidatorContext) {
