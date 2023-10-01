@@ -1,8 +1,12 @@
 const getAllData = async (mode) => {
   try {
     const res = await fetch(
-      import.meta.env.VITE_ROOT_API + `/api/announcements?mode=${mode}`
-    );
+      import.meta.env.VITE_ROOT_API + `/api/announcements?mode=${mode}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token")}`
+      }
+    })
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -16,12 +20,15 @@ const getDataById = async (id, isCount) => {
   if (isCount === undefined) {
     isCount = false;
   }
-
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-      "/api/announcements/" + id + "?count=" + isCount
-    );
+      "/api/announcements/" + id + "?count=" + isCount,{
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
+          }
+      })
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -33,7 +40,11 @@ const getDataById = async (id, isCount) => {
 
 const getAllCategories = async () => {
   try {
-    const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/category`);
+    const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/category`,{
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token")}`
+      }
+    });
     if (res.ok) {
       const categories = await res.json();
       return categories;
@@ -45,8 +56,11 @@ const getAllCategories = async () => {
 const getCategoryById = async (id) => {
   try {
     const res = await fetch(
-      import.meta.env.VITE_ROOT_API + "/api/category/" + id
-    );
+      import.meta.env.VITE_ROOT_API + "/api/category/" + id,{
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
+        }
+      })
     if (res.ok) {
       const category = await res.json();
       return category;
@@ -60,8 +74,11 @@ const getDataByPage = async (mode, page, size) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}`
-    );
+      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}`,{
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
+        }
+      })
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -75,8 +92,11 @@ const getAnnoucementPageByCategoryId = async (mode, page, size, catId) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}&category=${catId}`
-    );
+      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}&category=${catId}`,{
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
+        }
+      })
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -88,7 +108,12 @@ const getAnnoucementPageByCategoryId = async (mode, page, size, catId) => {
 
 const getAllUsers = async () => {
   try {
-    const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/users`);
+    const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/users`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token")}`
+      }
+    })
     if (res.ok) {
       const users = await res.json();
       return users;
@@ -101,9 +126,12 @@ const getAllUsers = async () => {
 const getUserById = async (id) => {
   try {
     const res = await fetch(
-      import.meta.env.VITE_ROOT_API +
-      "/api/users/" + id
-    );
+      import.meta.env.VITE_ROOT_API + "/api/users/" + id, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token")}`
+      }
+    })
     if (res.ok) {
       const data = await res.json();
       return data;
