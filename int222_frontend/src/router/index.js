@@ -9,7 +9,8 @@ import UserManagement from "../views/UserManagement.vue"
 import NotFound from "../views/NotFound.vue"
 import UserMatchPassword from "../views/UserMatchPassword.vue"
 import UserLogin from "../views/UserLogin.vue"
-
+import { useAuth } from '../stores/auth';
+import { getNewToken } from '../composable/getData';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -78,8 +79,28 @@ const router = createRouter({
       name: "UserLogin",
       component: UserLogin,
     },
-    
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  const auth = useAuth();
+  const { isTokenExpired, isRefreshTokenExpired } = auth;
+
+  if (to.name !== 'UserLogin' && isTokenExpired()) {
+    if (isRefreshTokenExpired()) {
+      next({ name: 'UserLogin' });
+    } else {
+      getNewToken()
+        .then(() => {
+          next({ name: to.name });
+        })
+        .catch(() => {
+          next({ name: 'UserLogin' });
+        });
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

@@ -18,8 +18,9 @@ const login = async () => {
         body: JSON.stringify(data)
     })
     if (response.ok) {
-        // const token = await response.json()
-        // isSuccess.value = true;
+        const res = await response.json()
+        localStorage.setItem('token', res.token)
+        localStorage.setItem('refreshToken', res.refreshToken)
         displayMsg.value = 'Login Successful'
     } else {
         const errorData = await response.json()
@@ -32,7 +33,6 @@ const login = async () => {
         }
     }
 }
-
 </script>
 <template>
     <div class="w-full h-screen bg-slate-100 items-center text-cyan-800">
