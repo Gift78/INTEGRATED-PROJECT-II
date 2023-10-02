@@ -2,7 +2,7 @@
 import TimezoneComponent from '../components/TimezoneComponent.vue'
 import Title from '../components/Title.vue';
 import NavbarComponent from '../components/NavbarComponent.vue'
-import { getAllUsers } from '../composable/getData.js'
+import { getAllUsers, getNewToken } from '../composable/getData.js'
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
@@ -19,7 +19,7 @@ const deleteUser = async (id) => {
         const res = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/" + id, {
             method: 'DELETE',
             headers:{
-                'Authorization': `Bearer ${localStorage.getItem("token")}`
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         })
         if (res.status === 200) {
@@ -28,6 +28,7 @@ const deleteUser = async (id) => {
             })
         } else {
             const errorData = await res.json();
+
             Swal.fire({
                 icon: 'error',
                 title: `Error ${errorData.status}`,

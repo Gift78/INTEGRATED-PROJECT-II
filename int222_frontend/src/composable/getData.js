@@ -141,6 +141,24 @@ const getUserById = async (id) => {
   }
 };
 
+const getNewToken = async () => {
+  console.log("refreshing token");
+
+  const res = await fetch(
+  import.meta.env.VITE_ROOT_API + "/api/token", {
+      method: "GET",
+      headers: {
+          "Authorization": `Bearer ${localStorage.getItem("refreshToken")}}`,
+      },
+  });
+
+  if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem("token", data.token);
+      return data;
+  }
+}
+
 export {
   getAllData,
   getDataById,
@@ -150,4 +168,5 @@ export {
   getAnnoucementPageByCategoryId,
   getAllUsers,
   getUserById,
+  getNewToken
 };

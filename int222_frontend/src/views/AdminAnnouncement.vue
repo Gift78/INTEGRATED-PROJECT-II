@@ -18,7 +18,10 @@ onMounted(async () => {
 const deleteAnnouncement = async (id) => {
     try {
         const res = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements/" + id, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
         })
         if (res.status === 200) {
             data.value = data.value.filter((ann) => {
@@ -26,6 +29,7 @@ const deleteAnnouncement = async (id) => {
             })
         } else {
             const errorData = await res.json();
+
             Swal.fire({
                 icon: 'error',
                 title: `Error ${errorData.status}`,
