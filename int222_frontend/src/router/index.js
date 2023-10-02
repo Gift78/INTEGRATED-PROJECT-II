@@ -86,7 +86,9 @@ router.beforeEach((to, from, next) => {
   const auth = useAuth();
   const { isTokenExpired, isRefreshTokenExpired, isLoggedIn } = auth;
 
-  if (to.name !== 'UserLogin' && isTokenExpired() && isLoggedIn()) {
+  if (!isLoggedIn() && to.name !== 'UserLogin') {
+    next({ name: 'UserLogin' });
+  } else if (to.name !== 'UserLogin' && isTokenExpired()) {
     if (isRefreshTokenExpired()) {
       next({ name: 'UserLogin' });
     } else {
