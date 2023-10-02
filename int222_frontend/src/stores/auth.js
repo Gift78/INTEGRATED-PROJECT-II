@@ -26,5 +26,9 @@ export const useAuth = defineStore('auth', () => {
         return getExpTime(localStorage.getItem("refreshToken")) < new Date();
     }
 
-    return { parseJwt, getExpTime, isTokenExpired, isRefreshTokenExpired }
+    const isLoggedIn = () => {
+        return localStorage.getItem("token") !== null && localStorage.getItem("refreshToken") !== null;
+    }
+
+    return { parseJwt, getExpTime, isTokenExpired, isRefreshTokenExpired, isLoggedIn }
 })

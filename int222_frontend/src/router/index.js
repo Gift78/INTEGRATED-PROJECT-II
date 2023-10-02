@@ -84,9 +84,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuth();
-  const { isTokenExpired, isRefreshTokenExpired } = auth;
+  const { isTokenExpired, isRefreshTokenExpired, isLoggedIn } = auth;
 
-  if (to.name !== 'UserLogin' && isTokenExpired()) {
+  if (to.name !== 'UserLogin' && isTokenExpired() && isLoggedIn()) {
     if (isRefreshTokenExpired()) {
       next({ name: 'UserLogin' });
     } else {
