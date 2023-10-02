@@ -2,15 +2,15 @@ package sit.int221.validators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.repositories.UserRepository;
 
 @Component
+@RequiredArgsConstructor
 public class OnCreateUniqueValidator implements ConstraintValidator<ValidUniqueOnCreate, CreateUserDTO> {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public boolean isValid(CreateUserDTO user, ConstraintValidatorContext constraintValidatorContext) {

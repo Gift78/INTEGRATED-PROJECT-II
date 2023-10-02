@@ -151,6 +151,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements/" + id, {
             method: 'PUT',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -178,6 +179,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements", {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -236,7 +238,7 @@ const toastMixin = Swal.mixin({
 <template>
     <div class="w-full  text-cyan-800 flex">
         <div class="w-1/6 bg-white rounded-br-3xl rounded-tr-3xl fixed h-screen shadow-2xl">
-            <NavbarComponent :haveComfirmation="true"/>
+            <NavbarComponent :haveComfirmation="true" />
         </div>
         <div class="w-1/6"></div>
         <div class="w-5/6 py-10 px-20">
@@ -315,13 +317,13 @@ const toastMixin = Swal.mixin({
             <!-- button -->
             <div class="flex justify-end mt-3 space-x-3 " v-if="announcement">
                 <button
-                    class="ann-button text-black bg-white text-center rounded-lg shadow-md cursor-pointer px-5 py-2 w-20 h-10"
+                    class="ann-button text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg transition-colors duration-300 w-28 h-12 ml-5 rounded-lg"
                     @click="showBackButtonConfirmation()">
                     Back
                 </button>
 
                 <button
-                    class="ann-button text-white bg-emerald-plus text-center rounded-lg shadow-md px-5 py-2 w-20 h-10 mb-24"
+                    class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg transition-colors duration-300 w-28 h-12 rounded-lg"
                     :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
                     :disabled="!isSubmitAllowed" @click="AddEditAnnouncement(announcement, params?.id)">
                     {{ isUpdatePage ? 'Update' : 'Add' }}

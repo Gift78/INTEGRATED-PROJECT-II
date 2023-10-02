@@ -85,8 +85,9 @@ const AddEditUser = async () => {
     if (isAddUserPage.value !== true) {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/" + params.id, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
+            headers:{
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                'Content-Type':'application/json'
             },
             body: JSON.stringify(data)
         })
@@ -125,6 +126,7 @@ const AddEditUser = async () => {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users", {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(newData)
@@ -164,7 +166,6 @@ const AddEditUser = async () => {
 }
 
 watch(password, () => {
-    console.log(password.value)
     if (!isPasswordSizeValid.value && password.value !== '') {
         passwordError.value = 'Password size must be between 8 and 14'
     } else if (!isPasswordValid.value && password.value !== '') {
@@ -319,13 +320,13 @@ const toastMixin = Swal.mixin({
                         </div>
                         <div class="flex mt-10">
                             <button
-                                class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg"
+                                class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg transition-colors duration-300 w-28 h-12 rounded-lg"
                                 :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
                                 @click="AddEditUser()">
                                 Save
                             </button>
                             <button
-                                class="text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg hover:scale-110 w-28 h-12 ml-5 rounded-lg"
+                                class="text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg transition-colors duration-300 w-28 h-12 ml-5 rounded-lg"
                                 @click="showBackButtonConfirmation()">
                                 Cancel
                             </button>

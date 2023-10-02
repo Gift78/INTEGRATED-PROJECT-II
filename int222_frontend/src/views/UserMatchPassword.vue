@@ -15,6 +15,7 @@ const matchPassword = async () => {
     const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/match", {
         method: 'POST',
         headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
@@ -23,7 +24,7 @@ const matchPassword = async () => {
         matchMsg.value = 'Password Matched'
     } else {
         const errorData = await response.json()
-        console.log(errorData)
+
         if (errorData.message?.slice(0, 4) === 'User') {
             matchMsg.value = 'The specified username DOES NOT exist'
         } else if (errorData.message === 'Password is not match') {
@@ -66,7 +67,7 @@ const matchPassword = async () => {
                         v-model="password">
                     <div class="flex mt-20">
                         <button
-                            class="ann-button text-white bg-cyan-800 hover:bg-cyan-700 border-0 shadow-lg hover:scale-110 w-28 h-12 rounded-lg"
+                            class="ann-button text-white bg-cyan-800 hover:bg-cyan-700 border-0 shadow-lg transition-colors duration-200 w-28 h-12 rounded-lg"
                             @click="matchPassword">
                             Match or Not
                         </button>

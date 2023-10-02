@@ -68,7 +68,7 @@ onMounted(async () => {
         </div>
 
         <div v-if="data" class="flex justify-end mt-4">
-            <button class="ann-button bg-cyan-800 text-white rounded-lg py-2 px-6" @click="router.push({name: 'UserAnnouncement'})">
+            <button class="ann-button bg-cyan-800 hover:bg-cyan-600 text-white rounded-lg py-2 px-6 transition-colors duration-200" @click="router.push({name: 'UserAnnouncement'})">
                 Back
             </button>
         </div>

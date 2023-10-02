@@ -1,7 +1,7 @@
 package sit.int221.services;
 
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class AnnouncementService {
-    @Autowired
-    private AnnouncementRepository announcementRepository;
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private ModelMapper modelMapper;
+    private final AnnouncementRepository announcementRepository;
+    private final CategoryService categoryService;
+    private final ModelMapper modelMapper;
 
     public List<Announcement> getAllAnnouncement(String mode) {
         if (Objects.equals(mode, "active")) {
