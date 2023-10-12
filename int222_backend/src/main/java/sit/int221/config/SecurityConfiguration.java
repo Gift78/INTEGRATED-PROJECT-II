@@ -13,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.AntPathMatcher;
 
+import static sit.int221.utils.UserRole.admin;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -22,6 +24,11 @@ public class SecurityConfiguration {
     private static final String[][] PUBLIC_ENDPOINTS = {
             { HttpMethod.POST.toString(), "/api/token" },
             { HttpMethod.OPTIONS.toString(), "/**"}
+    };
+
+    private static final String[] ADMIN_ENDPOINTS = {
+            "/api/users/**",
+            "/api/match/**",
     };
 
     public static boolean isPublicEndpoint(String method, String path) {
@@ -39,8 +46,11 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
+                            request.requestMatchers(ADMIN_ENDPOINTS).hasRole(admin.name());
                             for (String[] endpoint : PUBLIC_ENDPOINTS) {
-                                request.requestMatchers(HttpMethod.valueOf(endpoint[0]), endpoint[1]).permitAll();
+                                String httpMethod = endpoint[0];
+                                String endpointPath = endpoint[1];
+                                request.requestMatchers(httpMethod, endpointPath).permitAll();
                             }
                             request.anyRequest().authenticated();
                         }

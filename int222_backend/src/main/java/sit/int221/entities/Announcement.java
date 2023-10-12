@@ -34,4 +34,9 @@ public class Announcement {
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private Category category;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "announcementOwner")
+    private User announcementOwner;
 }
