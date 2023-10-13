@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.AntPathMatcher;
 
+import static org.springframework.security.config.Customizer.withDefaults;
 import static sit.int221.utils.Permission.*;
 import static sit.int221.utils.UserRole.admin;
 
@@ -26,7 +27,6 @@ public class SecurityConfiguration {
             { HttpMethod.GET.toString(), "/api/announcements/pages" },
             { HttpMethod.GET.toString(), "/api/category" },
             { HttpMethod.POST.toString(), "/api/token" },
-            { HttpMethod.OPTIONS.toString(), "/**"}
     };
 
     public static boolean isPublicEndpoint(String method, String path) {
@@ -42,21 +42,23 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
-                            request.requestMatchers("/api/users/**").hasRole(admin.name())
-                                        .requestMatchers("/api/match/**").hasRole(admin.name())
-                                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority(ADMIN_READ.name())
-                                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasAuthority(ADMIN_CREATE.name())
-                                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAuthority(ADMIN_UPDATE.name())
-                                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority(ADMIN_DELETE.name())
-                                        .requestMatchers(HttpMethod.POST, "/api/match/**").hasAuthority(ADMIN_CREATE.name());
-
                             for (String[] endpoint : PUBLIC_ENDPOINTS) {
                                 String httpMethod = endpoint[0];
                                 String endpointPath = endpoint[1];
                                 request.requestMatchers(httpMethod, endpointPath).permitAll();
                             }
+
+                            request
+                                    .requestMatchers("/api/users/**").hasRole(admin.name())
+                                    .requestMatchers("/api/match/**").hasRole(admin.name())
+                                    .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority(ADMIN_READ.name())
+                                    .requestMatchers(HttpMethod.POST, "/api/users/**").hasAuthority(ADMIN_CREATE.name())
+                                    .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAuthority(ADMIN_UPDATE.name())
+                                    .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority(ADMIN_DELETE.name())
+                                    .requestMatchers(HttpMethod.POST, "/api/match/**").hasAuthority(ADMIN_CREATE.name());
 
                             request.anyRequest().authenticated();
                         }
