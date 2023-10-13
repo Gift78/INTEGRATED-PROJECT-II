@@ -1,9 +1,13 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router'
+
 
 const username = ref('')
 const password = ref('')
 const displayMsg = ref('')
+
+const router = useRouter()
 
 const login = async () => {
     const data = {
@@ -22,6 +26,7 @@ const login = async () => {
         localStorage.setItem('token', res.token)
         localStorage.setItem('refreshToken', res.refreshToken)
         displayMsg.value = 'Login Successful'
+        router.push({ name: 'AdminAnnouncement' })
     } else {
         const errorData = await response.json()
         if (errorData.status === 401) {

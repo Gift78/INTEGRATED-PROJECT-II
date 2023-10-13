@@ -1,13 +1,15 @@
 import { defineStore } from 'pinia'
+import VueJwtDecode from 'vue-jwt-decode'
+
 
 export const useAuth = defineStore('auth', () => {
     const parseJwt = (token) => {
         let base64Url = token.split('.')[1];
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
-        
+
         return JSON.parse(jsonPayload);
     }
 
@@ -30,5 +32,13 @@ export const useAuth = defineStore('auth', () => {
         return localStorage.getItem("token") !== null && localStorage.getItem("refreshToken") !== null;
     }
 
-    return { parseJwt, getExpTime, isTokenExpired, isRefreshTokenExpired, isLoggedIn }
+    const getRole = () => {
+        if (localStorage.getItem("token") !== undefined) return VueJwtDecode.decode(localStorage.getItem("token")).role
+    }
+
+    const getUsername = () => {
+        if (localStorage.getItem("token") !== undefined) return VueJwtDecode.decode(localStorage.getItem("token")).sub
+    }
+
+    return { parseJwt, getExpTime, isTokenExpired, isRefreshTokenExpired, isLoggedIn, getRole, getUsername }
 })
