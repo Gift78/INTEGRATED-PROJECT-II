@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.AntPathMatcher;
 
+import static sit.int221.utils.Permission.*;
 import static sit.int221.utils.UserRole.admin;
 
 @Configuration
@@ -22,13 +23,10 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private static final String[][] PUBLIC_ENDPOINTS = {
+            { HttpMethod.GET.toString(), "/api/announcements/pages" },
+            { HttpMethod.GET.toString(), "/api/category" },
             { HttpMethod.POST.toString(), "/api/token" },
             { HttpMethod.OPTIONS.toString(), "/**"}
-    };
-
-    private static final String[] ADMIN_ENDPOINTS = {
-            "/api/users/**",
-            "/api/match/**",
     };
 
     public static boolean isPublicEndpoint(String method, String path) {
@@ -46,12 +44,20 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
-                            request.requestMatchers(ADMIN_ENDPOINTS).hasRole(admin.name());
+                            request.requestMatchers("/api/users/**").hasRole(admin.name())
+                                        .requestMatchers("/api/match/**").hasRole(admin.name())
+                                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority(ADMIN_READ.name())
+                                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasAuthority(ADMIN_CREATE.name())
+                                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAuthority(ADMIN_UPDATE.name())
+                                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority(ADMIN_DELETE.name())
+                                        .requestMatchers(HttpMethod.POST, "/api/match/**").hasAuthority(ADMIN_CREATE.name());
+
                             for (String[] endpoint : PUBLIC_ENDPOINTS) {
                                 String httpMethod = endpoint[0];
                                 String endpointPath = endpoint[1];
                                 request.requestMatchers(httpMethod, endpointPath).permitAll();
                             }
+
                             request.anyRequest().authenticated();
                         }
                 )
