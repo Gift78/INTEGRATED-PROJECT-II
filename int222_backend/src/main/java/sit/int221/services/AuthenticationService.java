@@ -13,6 +13,8 @@ import sit.int221.exceptions.UnauthorizedException;
 import sit.int221.exceptions.UserNotFoundException;
 import sit.int221.repositories.UserRepository;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -28,7 +30,8 @@ public class AuthenticationService {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
-            String token = jwtService.generateToken(user);
+            Map<String, Object> extraClaims = Map.of("userId", user.getId(),"role", user.getRole());
+            String token = jwtService.generateToken(extraClaims, user);
             String refreshToken = jwtService.generateRefreshToken(user);
             return new AuthenticationResponseDTO(token, refreshToken);
         } catch (BadCredentialsException e) {
