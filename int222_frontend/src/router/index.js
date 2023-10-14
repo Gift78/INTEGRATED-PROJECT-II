@@ -12,6 +12,8 @@ import UserLogin from "../views/UserLogin.vue"
 import UserLogout from "../views/UserLogout.vue"
 import { useAuth } from '../stores/auth';
 import { getNewToken } from '../composable/getData';
+import Swal from 'sweetalert2';
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,27 +92,45 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuth();
-  const { isTokenExpired, isRefreshTokenExpired, isLoggedIn } = auth;
+  const { isTokenExpired, isRefreshTokenExpired, isLoggedIn, getRole } = auth;
 
   if (to.name === 'UserAnnouncement' || to.name === 'UserAnnouncementDetail' || to.name === 'UserLogout') {
     next();
   } else if (!isLoggedIn() && to.name !== 'UserLogin') {
-    next({ name: 'UserLogin' });
+    next({ name: 'UserAnnouncement' });
   } else if (to.name !== 'UserLogin' && isTokenExpired()) {
     if (isRefreshTokenExpired()) {
-      next({ name: 'UserLogin' });
+      next({ name: 'UserAnnouncement' });
     } else {
       getNewToken()
         .then(() => {
           next({ name: to.name });
         })
         .catch(() => {
-          next({ name: 'UserLogin' });
+          next({ name: 'UserAnnouncement' });
         });
     }
-  } else {
+  }
+  else if (isLoggedIn() && getRole() !== 'admin' && (to.name == 'UserListing' || to.name == 'UserMatchPassword')) {
+    Swal.fire({
+      icon: 'error',
+      title: '403 Forbidden',
+      text: "You don't have permission to access this server.",
+      confirmButtonColor: '#155e75',
+      confirmButtonText: 'Go back',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        next({ name: 'AdminAnnouncement' });
+      }
+    })
+  }
+  else {
     next();
   }
+
+
+
+
 });
 
 

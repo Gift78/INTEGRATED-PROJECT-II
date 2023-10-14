@@ -23,12 +23,12 @@ const getDataById = async (id, isCount) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-      "/api/announcements/" + id + "?count=" + isCount,{
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem("token")}`
-          }
-      })
+      "/api/announcements/" + id + "?count=" + isCount, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token")}`
+      }
+    })
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -40,11 +40,7 @@ const getDataById = async (id, isCount) => {
 
 const getAllCategories = async () => {
   try {
-    const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/category`,{
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem("token")}`
-      }
-    });
+    const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/category`);
     if (res.ok) {
       const categories = await res.json();
       return categories;
@@ -56,11 +52,11 @@ const getAllCategories = async () => {
 const getCategoryById = async (id) => {
   try {
     const res = await fetch(
-      import.meta.env.VITE_ROOT_API + "/api/category/" + id,{
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token")}`
-        }
-      })
+      import.meta.env.VITE_ROOT_API + "/api/category/" + id, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token")}`
+      }
+    })
     if (res.ok) {
       const category = await res.json();
       return category;
@@ -74,11 +70,7 @@ const getDataByPage = async (mode, page, size) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}`,{
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token")}`
-        }
-      })
+      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}`)
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -92,11 +84,7 @@ const getAnnoucementPageByCategoryId = async (mode, page, size, catId) => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API +
-      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}&category=${catId}`,{
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token")}`
-        }
-      })
+      `/api/announcements/pages?mode=${mode}&page=${page}&size=${size}&category=${catId}`)
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -117,7 +105,7 @@ const getAllUsers = async () => {
     if (res.ok) {
       const users = await res.json();
       return users;
-    }
+    } 
   } catch (err) {
     console.log(err);
   }
@@ -145,17 +133,17 @@ const getNewToken = async () => {
   console.log("refreshing token");
 
   const res = await fetch(
-  import.meta.env.VITE_ROOT_API + "/api/token", {
-      method: "GET",
-      headers: {
-          "Authorization": `Bearer ${localStorage.getItem("refreshToken")}}`,
-      },
+    import.meta.env.VITE_ROOT_API + "/api/token", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("refreshToken")}}`,
+    },
   });
 
   if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem("token", data.token);
-      return data;
+    const data = await res.json();
+    localStorage.setItem("token", data.token);
+    return data;
   }
 }
 

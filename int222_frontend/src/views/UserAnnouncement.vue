@@ -11,6 +11,7 @@ import { useMode } from '../stores/mode';
 import { storeToRefs } from 'pinia'
 import { getAllCategories } from '../composable/getData';
 import { getAnnoucementPageByCategoryId } from '../composable/getData';
+import LoginIcon from "../components/icons/LoginIcon.vue"
 
 const router = useRouter()
 const modeStore = useMode()
@@ -31,7 +32,6 @@ onMounted(async () => {
         closedButton.value = 'text-white bg-red-500'
         activeButton.value = ''
     }
-
     categoryItem.value = await getAllCategories()
     data.value = await getDataByPage(mode.value, currentPage.value, 5);
 })
@@ -81,6 +81,13 @@ const changePageButton = (page) => {
     <div class="h-screen text-cyan-800">
         <div style="width: 80em;" class="mx-auto">
             <!-- header -->
+            <div class="w-full flex justify-end">
+                <button @click="router.push('login')"
+                    class=" flex border pr-5 pl-3 py-2 rounded-lg mt-5 text-white text-lg bg-emerald-plus hover:bg-emerald-light transition-colors duration-200">
+                    <LoginIcon class="text-white mx-1" />
+                    Login
+                </button>
+            </div>
             <Title text="SIT Announcement System (SAS)" />
             <!-- time zone bar -->
             <div class="flex justify-between">
@@ -125,7 +132,7 @@ const changePageButton = (page) => {
             <div v-else>
                 <div v-for="(announcement, index) in data.content" :key="data.id"
                     class="ann-item grid grid-cols-9 bg-white hover:bg-slate-100 transition-colors duration-200 my-5 py-7 h-20 rounded-xl shadow-md cursor-pointer"
-                    @click="router.push({name: 'UserAnnouncementDetail', params: {id: announcement.id}})">
+                    @click="router.push({ name: 'UserAnnouncementDetail', params: { id: announcement.id } })">
                     <div class="text-center"> {{ index + 1 + (currentPage * 5) }}</div>
                     <div class="ann-title underline overflow-hidden"
                         :class="mode == 'active' ? 'col-span-7' : 'col-span-5'">
