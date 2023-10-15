@@ -67,7 +67,7 @@ public class UserService {
     private void validateUniqueOnUpdate(User existUser, String trimmedUsername, String trimmedName, String trimmedEmail){
         List<String> fieldError = new ArrayList<>();
 
-        if (!trimmedUsername.equalsIgnoreCase(existUser.getUsername())){
+        if (!trimmedUsername.equalsIgnoreCase(existUser.getUsername())) {
             Optional<User> duplicateUsername = userRepository.findByUsername(trimmedUsername);
             if (duplicateUsername.isPresent()){
                 fieldError.add("username");
