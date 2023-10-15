@@ -7,12 +7,17 @@ import Title from '../components/Title.vue';
 import TimezoneComponent from '../components/TimezoneComponent.vue';
 import NavbarComponent from '../components/NavbarComponent.vue'
 import Swal from 'sweetalert2';
+import { useAuth } from '../stores/auth';
+
+const auth = useAuth()
+const { getRole } = auth
 
 const data = ref([]);
 const router = useRouter();
 
 onMounted(async () => {
-    data.value = await getAllData('admin');
+    data.value = await getAllData();
+    console.log(data.value)
 });
 
 const deleteAnnouncement = async (id) => {
@@ -85,13 +90,14 @@ const showDeleteModal = (id) => {
             <hr class="mt-4 border-2">
 
             <!-- head table -->
-            <div class="grid grid-cols-12 my-5">
+            <div :class="getRole()==='admin'?'grid grid-cols-14 my-5' : 'grid grid-cols-12 my-5'">
                 <div class="text-center text-zinc-400">No.</div>
                 <div class="text-zinc-400 col-span-2">Title</div>
                 <div class="text-center text-zinc-400">Category</div>
                 <div class="text-center text-zinc-400 col-span-2">Publish Date</div>
                 <div class="text-center text-zinc-400 col-span-2">Close Date</div>
                 <div class="text-center text-zinc-400">Display</div>
+                <div class="text-center text-zinc-400 col-span-2" v-if="getRole()==='admin'">Owner</div>
                 <div class="text-center text-zinc-400">Views</div>
                 <div class="text-center text-zinc-400 col-span-2">Action</div>
             </div>
@@ -102,8 +108,8 @@ const showDeleteModal = (id) => {
             </div>
             <div v-else>
                 <!-- show data -->
-                <div v-for="(announcement, index) in data" :key="data.id"
-                    class="ann-item grid grid-cols-12 bg-white my-5 h-20 rounded-xl shadow-md">
+                <div v-for="(announcement, index) in data" :key="data.id" :class="getRole()==='admin'?'grid grid-cols-14 my-5' : 'grid grid-cols-12 my-5'"
+                    class="ann-item bg-white h-20 rounded-xl shadow-md">
                     <div class="text-cyan-800 my-auto text-center">{{ index + 1 }} </div>
                     <div class="ann-title text-cyan-800 my-auto col-span-2 overflow-hidden">{{
                         announcement.announcementTitle }}
@@ -120,6 +126,7 @@ const showDeleteModal = (id) => {
                         :class="announcement.announcementDisplay == 'Y' ? 'bg-emerald-100 text-emerald-400' : 'bg-red-100 text-red-400'">
                         {{ announcement.announcementDisplay }}
                     </div>
+                    <div class="ann-views text-cyan-800 my-auto text-center col-span-2" v-if="getRole()==='admin'">{{ announcement.announcementOwner }}</div>
                     <div class="ann-views text-cyan-800 my-auto text-center">{{ announcement.viewCount }}</div>
                     <div class="flex ml-10 col-span-2">
                         <div class="ann-button mx-2 text-cyan-400 my-auto text-center bg-cyan-100 hover:bg-cyan-200 transition-colors duration-200 rounded-lg pt-2 w-16 h-10 shadow-sm cursor-pointer"

@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import Swal from 'sweetalert2';
 import { useAuth } from '../stores/auth';
-import UserIcon from '../components/icons/usericon.vue'
+import UserIcon from '../components/icons/UserIcon.vue'
 
 
 const router = useRouter();
