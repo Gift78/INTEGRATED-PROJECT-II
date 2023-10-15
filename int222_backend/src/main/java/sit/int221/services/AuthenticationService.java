@@ -53,9 +53,11 @@ public class AuthenticationService {
 
             if (username != null) {
                 User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
-                jwtService.isTokenValid(refreshToken, user);
-                String token = jwtService.generateToken(user);
-                return new AuthenticationResponseDTO(token, refreshToken);
+                if (jwtService.isTokenValid(refreshToken, user)) {
+                    Map<String, Object> extraClaims = Map.of("userId", user.getId(),"role", user.getRole());
+                    String token = jwtService.generateToken(extraClaims, user);
+                    return new AuthenticationResponseDTO(token, refreshToken);
+                }
             }
         } catch (ExpiredJwtException ex) {
             throw new UnauthorizedException("Refresh token has expired");
