@@ -9,7 +9,7 @@ import sit.int221.services.AuthenticationService;
 
 @RestController
 @RequestMapping("/api/token")
-@CrossOrigin(origins= {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
+@CrossOrigin(origins= {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th","http://127.0.0.1:5173"})
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
