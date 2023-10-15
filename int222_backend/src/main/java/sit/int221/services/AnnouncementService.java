@@ -84,7 +84,7 @@ public class AnnouncementService {
         User user = userService.getUserByAuthorizationHeader(authorizationHeader);
         Announcement oldAnnouncement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
 
-        if (!Objects.equals(oldAnnouncement.getAnnouncementOwner().getId(), user.getId())) {
+        if (!Objects.equals(oldAnnouncement.getAnnouncementOwner().getId(), user.getId()) && !Objects.equals(user.getRole(), UserRole.admin)) {
             throw new AnnouncementForbidden("You are not the owner of this announcement");
         }
 
@@ -102,7 +102,7 @@ public class AnnouncementService {
         User user = userService.getUserByAuthorizationHeader(authorizationHeader);
         Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
 
-        if (!Objects.equals(announcement.getAnnouncementOwner().getId(), user.getId())) {
+        if (!Objects.equals(announcement.getAnnouncementOwner().getId(), user.getId()) && !Objects.equals(user.getRole(), UserRole.admin)) {
             throw new AnnouncementForbidden("You are not the owner of this announcement");
         }
 
