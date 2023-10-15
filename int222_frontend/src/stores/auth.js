@@ -33,11 +33,11 @@ export const useAuth = defineStore('auth', () => {
     }
 
     const getRole = () => {
-        if (localStorage.getItem("token") !== undefined) return VueJwtDecode.decode(localStorage.getItem("token")).role
+        if (isLoggedIn()) return VueJwtDecode.decode(localStorage.getItem("token")).role
     }
 
     const getUsername = () => {
-        if (localStorage.getItem("token") !== undefined) return VueJwtDecode.decode(localStorage.getItem("token")).sub
+        if (isLoggedIn()) return VueJwtDecode.decode(localStorage.getItem("token")).sub
     }
 
     return { parseJwt, getExpTime, isTokenExpired, isRefreshTokenExpired, isLoggedIn, getRole, getUsername }

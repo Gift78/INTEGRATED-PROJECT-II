@@ -23,7 +23,7 @@ const data = ref([])
 const categoryItem = ref([])
 const selectedCategory = ref('')
 const currentPage = ref(0)
-
+const buttonText = ref('Login')
 onMounted(async () => {
     if (mode.value == 'active') {
         activeButton.value = 'text-white bg-emerald-light'
@@ -34,6 +34,11 @@ onMounted(async () => {
     }
     categoryItem.value = await getAllCategories()
     data.value = await getDataByPage(mode.value, currentPage.value, 5);
+    if (localStorage.getItem("token") !== null) {
+        buttonText.value = 'Announcement List'
+    } else {
+        buttonText.value = 'Login'
+    }
 })
 
 watch([currentPage, selectedCategory, mode], async () => {
@@ -74,7 +79,16 @@ const displayedButtons = computed(() => {
 
 const changePageButton = (page) => {
     currentPage.value = page;
-};
+}
+
+const goToLoginPage = () => {
+    if (localStorage.getItem("token") !== null) {
+        router.push({ name: "AdminAnnouncement" })
+    } else {
+        router.push({ name: "UserLogin" })
+    }
+}
+
 </script>
  
 <template>
@@ -82,10 +96,10 @@ const changePageButton = (page) => {
         <div style="width: 80em;" class="mx-auto">
             <!-- header -->
             <div class="w-full flex justify-end">
-                <button @click="router.push('login')"
+                <button @click="goToLoginPage()"
                     class=" flex border pr-5 pl-3 py-2 rounded-lg mt-5 text-white text-lg bg-emerald-plus hover:bg-emerald-light transition-colors duration-200">
                     <LoginIcon class="text-white mx-1" />
-                    Login
+                    {{ buttonText }}
                 </button>
             </div>
             <Title text="SIT Announcement System (SAS)" />

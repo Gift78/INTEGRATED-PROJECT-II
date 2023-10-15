@@ -1,4 +1,4 @@
-const getAllData = async (mode) => {
+const getAllData = async () => {
   try {
     const res = await fetch(
       import.meta.env.VITE_ROOT_API + `/api/announcements`, {
