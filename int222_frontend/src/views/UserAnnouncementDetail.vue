@@ -7,7 +7,7 @@ import Title from '../components/Title.vue';
 import Megaphone from '../components/icons/Megaphone.vue';
 import { formatDatetimeLocal } from '../composable/formatDatetime';
 import { storeToRefs } from 'pinia'
-import { getDataById } from '../composable/getData';
+import { getDataUserById } from '../composable/getData';
 import Swal from 'sweetalert2'
 
 const router = useRouter();
@@ -17,7 +17,7 @@ const modeStore = useMode();
 const { mode } = storeToRefs(modeStore);
 
 onMounted(async () => {
-    data.value = await getDataById(params?.id, true)
+    data.value = await getDataUserById(params?.id, true)
     
     if (data.value === undefined || data.value === null) {
         Swal.fire({

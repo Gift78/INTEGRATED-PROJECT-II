@@ -93,7 +93,6 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuth();
   const { isTokenExpired, isRefreshTokenExpired, isLoggedIn, getRole } = auth;
-
   if (to.name === 'UserAnnouncement' || to.name === 'UserAnnouncementDetail' || to.name === 'UserLogout') {
     next();
   } else if (!isLoggedIn() && to.name !== 'UserLogin') {
@@ -127,10 +126,6 @@ router.beforeEach((to, from, next) => {
   else {
     next();
   }
-
-
-
-
 });
 
 

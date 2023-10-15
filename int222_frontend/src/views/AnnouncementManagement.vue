@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import Title from '../components/Title.vue';
 import TimezoneComponent from '../components/TimezoneComponent.vue';
 import NavbarComponent from '../components/NavbarComponent.vue'
-import { getDataById, getAllCategories } from '../composable/getData.js';
+import { getDataAdminById, getAllCategories } from '../composable/getData.js';
 import { getFormattedDate, getFormattedTime, getFormattedDateTimeISO } from '../composable/formatDatetime.js';
 
 const params = useRoute().params;
@@ -25,7 +25,7 @@ onMounted(async () => {
     categoryItem.value = await getAllCategories();
     if (params?.id) {
         isUpdatePage.value = true;
-        announcement.value = await getDataById(params?.id, false);
+        announcement.value = await getDataAdminById(params?.id, false);
         publishDate.value = getFormattedDate(announcement.value.publishDate);
         publishTime.value = getFormattedTime(announcement.value.publishDate);
         closeDate.value = getFormattedDate(announcement.value.closeDate);

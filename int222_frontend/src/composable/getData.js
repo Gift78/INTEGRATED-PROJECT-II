@@ -1,7 +1,7 @@
 const getAllData = async (mode) => {
   try {
     const res = await fetch(
-      import.meta.env.VITE_ROOT_API + `/api/announcements?mode=${mode}`, {
+      import.meta.env.VITE_ROOT_API + `/api/announcements`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem("token")}`
@@ -16,7 +16,7 @@ const getAllData = async (mode) => {
   }
 };
 
-const getDataById = async (id, isCount) => {
+const getDataAdminById = async (id, isCount) => {
   if (isCount === undefined) {
     isCount = false;
   }
@@ -29,6 +29,22 @@ const getDataById = async (id, isCount) => {
         'Authorization': `Bearer ${localStorage.getItem("token")}`
       }
     })
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+const getDataUserById = async (id, isCount) => {
+  if (isCount === undefined) {
+    isCount = false;
+  }
+  try {
+    const res = await fetch(
+      import.meta.env.VITE_ROOT_API +
+      "/api/announcements/" + id + "?count=" + isCount)
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -147,7 +163,8 @@ const getNewToken = async () => {
 
 export {
   getAllData,
-  getDataById,
+  getDataAdminById,
+  getDataUserById,
   getAllCategories,
   getCategoryById,
   getDataByPage,

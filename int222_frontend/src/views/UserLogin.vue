@@ -54,11 +54,11 @@ const login = async () => {
                 </div>
 
                 <div class="text-lg mt-5 text-cyan-800">Username</div>
-                <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
+                <input type="text" @keyup.enter="login" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
                     v-model.trim="username" maxlength="45">
                 <span class="px-4 flex flex-col items-end">({{ username.length }}/45)</span>
                 <div class="text-lg text-cyan-800 ">Password</div>
-                <input type="password" v-model="password"
+                <input type="password" v-model="password" @keyup.enter="login"
                     class="ann-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white">
 
                 <div class="flex mt-10">

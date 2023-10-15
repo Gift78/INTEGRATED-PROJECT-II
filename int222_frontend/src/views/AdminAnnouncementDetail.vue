@@ -7,7 +7,7 @@ import Title from '../components/Title.vue';
 import TimezoneComponent from '../components/TimezoneComponent.vue';
 import NavbarComponent from '../components/NavbarComponent.vue'
 import ViewCounter from '../components/icons/ViewCounter.vue';
-import { getDataById } from '../composable/getData';
+import { getDataAdminById } from '../composable/getData';
 import Swal from 'sweetalert2';
 
 const { params } = useRoute();
@@ -15,7 +15,7 @@ const router = useRouter();
 const data = ref({});
 
 onMounted(async () => {
-    data.value = await getDataById(params?.id)
+    data.value = await getDataAdminById(params?.id)
 
     if (data.value === undefined || data.value === null) {
         Swal.fire({
