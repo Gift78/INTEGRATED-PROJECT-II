@@ -17,7 +17,6 @@ const router = useRouter();
 
 onMounted(async () => {
     data.value = await getAllData();
-    console.log(data.value)
 });
 
 const deleteAnnouncement = async (id) => {
