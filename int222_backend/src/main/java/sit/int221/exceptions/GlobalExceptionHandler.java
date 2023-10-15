@@ -49,4 +49,10 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
+
+    @ExceptionHandler(AnnouncementForbidden.class)
+    public ResponseEntity<ErrorResponse> handleAnnouncementForbidden(AnnouncementForbidden ex, WebRequest webRequest){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage(), webRequest.getDescription(false).substring(4));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
 }

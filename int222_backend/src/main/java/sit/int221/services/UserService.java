@@ -20,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -107,5 +108,11 @@ public class UserService {
         } else {
             throw new UnauthorizedException("Password is not match");
         }
+    }
+
+    public User getUserByAuthorizationHeader(String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+        Integer userId = jwtService.extractUserId(token);
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

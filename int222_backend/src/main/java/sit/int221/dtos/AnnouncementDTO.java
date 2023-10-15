@@ -1,6 +1,7 @@
 package sit.int221.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,13 @@ public class AnnouncementDTO {
     private Category category;
     public String getAnnouncementCategory() {
         return category.getCategoryName();
+    }
+
+    @JsonIgnore
+    private UserDTO announcementOwner;
+
+    @JsonProperty("announcementOwner")
+    public String getAnnouncementOwner() {
+        return announcementOwner.getUsername();
     }
 }

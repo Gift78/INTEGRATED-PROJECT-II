@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import sit.int221.entities.Announcement;
 import org.springframework.data.jpa.repository.JpaRepository;
+import sit.int221.entities.User;
 import sit.int221.utils.AnnouncementDisplay;
 
 import java.time.ZonedDateTime;
@@ -52,4 +53,7 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Inte
     Page<Announcement> findAllByCloseDateIsNotNullAndAnnouncementDisplayEqualsAndCloseDateBeforeAndCategory_Id(AnnouncementDisplay announcementDisplay, ZonedDateTime currentTime, Integer categoryId, Pageable pageable);
 
     Page<Announcement> findAllByCategory_Id(Integer categoryId, Pageable pageable);
+
+
+    List<Announcement> findAllByAnnouncementOwner(User user);
 }
