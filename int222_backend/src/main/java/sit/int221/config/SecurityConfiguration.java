@@ -25,6 +25,7 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private static final String[][] PUBLIC_ENDPOINTS = {
             { HttpMethod.GET.toString(), "/api/announcements/pages" },
+            { HttpMethod.GET.toString(), "/api/announcements/**" },
             { HttpMethod.GET.toString(), "/api/category" },
             { HttpMethod.POST.toString(), "/api/token" },
     };

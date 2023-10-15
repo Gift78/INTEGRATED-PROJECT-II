@@ -24,39 +24,46 @@ public class AnnouncementController {
     private final ListMapper listMapper;
 
     @GetMapping("")
-    public List<AnnouncementDTO> getAllAnnouncement(@RequestParam(required = false) String mode) {
-        return listMapper.mapList(announcementService.getAllAnnouncement(mode), AnnouncementDTO.class, modelMapper);
+    public List<AnnouncementDTO> getAllAnnouncement(@RequestHeader(value = "Authorization") String authorizationHeader) {
+        return listMapper.mapList(announcementService.getAllAnnouncement(authorizationHeader), AnnouncementDTO.class, modelMapper);
     }
 
     @GetMapping("/{id}")
-    public AnnouncementDTO getAnnouncement(@PathVariable Integer id, @RequestParam(required = false) Boolean count) {
-        Announcement announcement = announcementService.getAnnouncement(id, count);
+    public AnnouncementDTO getAnnouncement(@PathVariable Integer id,
+                                           @RequestParam(required = false) Boolean count,
+                                           @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        Announcement announcement = announcementService.getAnnouncement(id, count, authorizationHeader);
         return modelMapper.map(announcement, AnnouncementDTO.class);
     }
 
     @PostMapping("")
-    public CreateAndUpdateAnnouncementResponseDTO createAnnouncement(@Valid @RequestBody CreateAndUpdateAnnouncementDTO newAnnouncement, BindingResult bindingResult) throws MethodArgumentNotValidException {
+    public CreateAndUpdateAnnouncementResponseDTO createAnnouncement(@Valid @RequestBody CreateAndUpdateAnnouncementDTO newAnnouncement,
+                                                                     @RequestHeader(value = "Authorization") String authorizationHeader,
+                                                                     BindingResult bindingResult) throws MethodArgumentNotValidException {
         if (bindingResult.hasErrors()) {
             throw new MethodArgumentNotValidException((MethodParameter) null, bindingResult);
         }
 
-        Announcement announcement = announcementService.createAnnouncement(newAnnouncement);
+        Announcement announcement = announcementService.createAnnouncement(newAnnouncement, authorizationHeader);
         return modelMapper.map(announcement, CreateAndUpdateAnnouncementResponseDTO.class);
     }
 
     @PutMapping("/{id}")
-    public CreateAndUpdateAnnouncementResponseDTO updateAnnouncement(@PathVariable Integer id,@Valid @RequestBody CreateAndUpdateAnnouncementDTO newAnnouncement, BindingResult bindingResult) throws MethodArgumentNotValidException {
+    public CreateAndUpdateAnnouncementResponseDTO updateAnnouncement(@PathVariable Integer id,
+                                                                     @Valid @RequestBody CreateAndUpdateAnnouncementDTO newAnnouncement,
+                                                                     @RequestHeader(value = "Authorization") String authorizationHeader,
+                                                                     BindingResult bindingResult) throws MethodArgumentNotValidException {
         if (bindingResult.hasErrors()) {
             throw new MethodArgumentNotValidException((MethodParameter) null, bindingResult);
         }
 
-        Announcement announcement = announcementService.updateAnnouncement(id, newAnnouncement);
+        Announcement announcement = announcementService.updateAnnouncement(id, newAnnouncement, authorizationHeader);
         return modelMapper.map(announcement, CreateAndUpdateAnnouncementResponseDTO.class);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAnnouncement(@PathVariable Integer id) {
-        announcementService.deleteAnnouncement(id);
+    public void deleteAnnouncement(@PathVariable Integer id, @RequestHeader(value = "Authorization") String authorizationHeader) {
+        announcementService.deleteAnnouncement(id, authorizationHeader);
     }
 
     @GetMapping("/pages")

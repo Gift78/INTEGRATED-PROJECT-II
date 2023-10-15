@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 import sit.int221.dtos.CreateAndUpdateAnnouncementDTO;
 import sit.int221.entities.Announcement;
 import sit.int221.entities.Category;
+import sit.int221.entities.User;
+import sit.int221.exceptions.AnnouncementForbidden;
 import sit.int221.exceptions.AnnouncementNotFoundException;
 import sit.int221.repositories.AnnouncementRepository;
 import sit.int221.utils.AnnouncementDisplay;
+import sit.int221.utils.UserRole;
 
 import java.time.ZonedDateTime;
 import java.util.Comparator;
@@ -24,43 +27,67 @@ import java.util.Objects;
 public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
     private final CategoryService categoryService;
+    private final JwtService jwtService;
+    private final UserService userService;
     private final ModelMapper modelMapper;
 
-    public List<Announcement> getAllAnnouncement(String mode) {
-        if (Objects.equals(mode, "active")) {
-            List<Announcement> activeAnnouncements = announcementRepository.getActiveAnnouncements(AnnouncementDisplay.Y, ZonedDateTime.now());
-            activeAnnouncements.sort(Comparator.comparing(Announcement::getId).reversed());
-            return activeAnnouncements;
-        } else if (Objects.equals(mode, "close")){
-            List<Announcement> closeAnnouncements = announcementRepository.findAllByCloseDateIsNotNullAndAnnouncementDisplayEqualsAndCloseDateBefore(AnnouncementDisplay.Y, ZonedDateTime.now());
-            closeAnnouncements.sort(Comparator.comparing(Announcement::getId).reversed());
-            return closeAnnouncements;
-        } else {
+    public List<Announcement> getAllAnnouncement(String authorizationHeader) {
+        String jwt = authorizationHeader.substring(7);
+        UserRole role = UserRole.valueOf(jwtService.extractRole(jwt));
+        Integer userId = jwtService.extractUserId(jwt);
+
+        if (role.equals(UserRole.admin)) {
             Sort sort = Sort.by(Sort.Direction.DESC, "id");
             return announcementRepository.findAll(sort);
+        } else {
+            User user = userService.getUser(userId);
+            List<Announcement> announcements = announcementRepository.findAllByAnnouncementOwner(user);
+            announcements.sort(Comparator.comparing(Announcement::getId).reversed());
+            return announcements;
         }
     }
 
-    public Announcement getAnnouncement(Integer announcementId, Boolean viewCount) {
-        if (viewCount != null && viewCount) {
-            Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
-            announcement.setViewCount(announcement.getViewCount() + 1);
-            return announcementRepository.saveAndFlush(announcement);
+    public Announcement getAnnouncement(Integer announcementId, Boolean viewCount, String authorizationHeader) {
+        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
+
+        if (authorizationHeader != null) {
+            String jwt = authorizationHeader.substring(7);
+            UserRole role = UserRole.valueOf(jwtService.extractRole(jwt));
+
+            if (role.equals(UserRole.announcer)) {
+                User user = userService.getUserByAuthorizationHeader(authorizationHeader);
+                if (!Objects.equals(announcement.getAnnouncementOwner().getId(), user.getId())) {
+                    throw new AnnouncementForbidden("You are not the owner of this announcement");
+                }
+            }
+        } else {
+            if (viewCount != null && viewCount) {
+                announcement.setViewCount(announcement.getViewCount() + 1);
+                return announcementRepository.saveAndFlush(announcement);
+            }
         }
 
-        return announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
+        return announcement;
     }
 
-    public Announcement createAnnouncement(CreateAndUpdateAnnouncementDTO announcement) {
+    public Announcement createAnnouncement(CreateAndUpdateAnnouncementDTO announcement, String authorizationHeader) {
         Category category = categoryService.getCategory(announcement.getCategoryId());
+        User user = userService.getUserByAuthorizationHeader(authorizationHeader);
         Announcement newAnnouncement = modelMapper.map(announcement, Announcement.class);
         newAnnouncement.setCategory(category);
         newAnnouncement.setViewCount(0);
+        newAnnouncement.setAnnouncementOwner(user);
         return announcementRepository.saveAndFlush(newAnnouncement);
     }
 
-    public Announcement updateAnnouncement(Integer announcementId, CreateAndUpdateAnnouncementDTO announcement) {
+    public Announcement updateAnnouncement(Integer announcementId, CreateAndUpdateAnnouncementDTO announcement, String authorizationHeader) {
+        User user = userService.getUserByAuthorizationHeader(authorizationHeader);
         Announcement oldAnnouncement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
+
+        if (!Objects.equals(oldAnnouncement.getAnnouncementOwner().getId(), user.getId())) {
+            throw new AnnouncementForbidden("You are not the owner of this announcement");
+        }
+
         Category category = categoryService.getCategory(announcement.getCategoryId());
         oldAnnouncement.setAnnouncementTitle(announcement.getAnnouncementTitle());
         oldAnnouncement.setAnnouncementDescription(announcement.getAnnouncementDescription());
@@ -71,8 +98,14 @@ public class AnnouncementService {
         return announcementRepository.saveAndFlush(oldAnnouncement);
     }
 
-    public void deleteAnnouncement(Integer announcementId) {
+    public void deleteAnnouncement(Integer announcementId, String authorizationHeader) {
+        User user = userService.getUserByAuthorizationHeader(authorizationHeader);
         Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
+
+        if (!Objects.equals(announcement.getAnnouncementOwner().getId(), user.getId())) {
+            throw new AnnouncementForbidden("You are not the owner of this announcement");
+        }
+
         announcementRepository.delete(announcement);
     }
 
