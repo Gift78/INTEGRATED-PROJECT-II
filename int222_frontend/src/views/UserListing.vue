@@ -7,18 +7,21 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import { formatDatetimeLocal } from '../composable/formatDatetime';
+import VueJwtDecode from 'vue-jwt-decode'
 
 const router = useRouter();
 const users = ref([])
+const userLoginId = ref('')
 onMounted(async () => {
     users.value = await getAllUsers();
+    userLoginId.value = VueJwtDecode.decode(localStorage.getItem("token")).userId
 });
 
 const deleteUser = async (id) => {
     try {
         const res = await fetch(import.meta.env.VITE_ROOT_API + "/api/users/" + id, {
             method: 'DELETE',
-            headers:{
+            headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         })
@@ -46,20 +49,29 @@ const deleteUser = async (id) => {
     }
 }
 
-const showDeleteModal = (id) => {
-    Swal.fire({
-        icon: 'warning',
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        confirmButtonColor: '#155e75',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep it'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            deleteUser(id)
-        }
-    })
+const showDeleteModal = (adminId, id) => {
+    if (adminId === id) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'You cannot delete your own account.',
+            confirmButtonColor: '#155e75',
+        });
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Are you sure?',
+            text: "The announcemenets owned by this user will be transfered to you. Do you still want to delete this user?",
+            confirmButtonColor: '#155e75',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteUser(id)
+            }
+        })
+    }
 }
 
 </script>
@@ -98,7 +110,7 @@ const showDeleteModal = (id) => {
             <div v-else class="ann-item grid grid-cols-14 my-5 bg-white h-20 rounded-xl shadow-md"
                 v-for="(user, index) in users" :key="user.id">
                 <div class="my-auto text-center">{{ index + 1 }}</div>
-                <div class="ann-username my-auto col-span-2">{{ user.username }}</div>
+                <div class="ann-username my-auto col-span-2 overflow-hidden mr-4">{{ user.username }}</div>
                 <div class="ann-name my-auto col-span-2">{{ user.name }}</div>
                 <div class="ann-email my-auto col-span-2">{{ user.email }}</div>
                 <div class="ann-role my-auto text-center">{{ user.role }}</div>
@@ -110,7 +122,7 @@ const showDeleteModal = (id) => {
                         @click="router.push({ name: 'UserDetail', params: { id: user.id } })">edit</button>
                     <button
                         class="ann-button text-red-400 bg-red-100 hover:bg-red-200 transition-colors duration-200 rounded-lg w-16 h-12 shadow-sm mx-2"
-                        @click="showDeleteModal(user.id)">delete</button>
+                        @click="showDeleteModal(userLoginId, user.id)">delete</button>
                 </div>
             </div>
         </div>

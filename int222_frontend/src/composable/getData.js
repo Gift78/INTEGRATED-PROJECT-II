@@ -130,8 +130,6 @@ const getUserById = async (id) => {
 };
 
 const getNewToken = async () => {
-  console.log("refreshing token");
-
   const res = await fetch(
     import.meta.env.VITE_ROOT_API + "/api/token", {
     method: "GET",
