@@ -96,10 +96,10 @@ public class UserService {
         }
     }
 
-    public void deleteUser(Integer id,String authorizationHeader) {
+    public void deleteUser(Integer id, String authorizationHeader) {
         User existUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         User user = getUserByAuthorizationHeader(authorizationHeader);
-        if (user.getId()==existUser.getId()){
+        if (user.getId() == existUser.getId()){
             throw new RuntimeException("You cannot delete your own account");
         }
         List<Announcement> announcements = announcementRepository.findAllByAnnouncementOwner(existUser);
