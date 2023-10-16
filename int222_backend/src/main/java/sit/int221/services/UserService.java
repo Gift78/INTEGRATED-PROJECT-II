@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import sit.int221.dtos.CreateUserDTO;
 import sit.int221.dtos.UpdateUserDTO;
 import sit.int221.dtos.UserMatchDTO;
+import sit.int221.entities.Announcement;
 import sit.int221.entities.User;
 import sit.int221.exceptions.*;
+import sit.int221.repositories.AnnouncementRepository;
 import sit.int221.repositories.UserRepository;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final AnnouncementRepository announcementRepository;
     private final JwtService jwtService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
@@ -93,8 +96,16 @@ public class UserService {
         }
     }
 
-    public void deleteUser(Integer id) {
+    public void deleteUser(Integer id, String authorizationHeader) {
         User existUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        User user = getUserByAuthorizationHeader(authorizationHeader);
+        if (user.getId() == existUser.getId()){
+            throw new RuntimeException("You cannot delete your own account");
+        }
+        List<Announcement> announcements = announcementRepository.findAllByAnnouncementOwner(existUser);
+        for (Announcement announcement : announcements){
+            announcement.setAnnouncementOwner(user);
+        }
         userRepository.delete(existUser);
     }
 

@@ -12,7 +12,7 @@ import sit.int221.services.CategoryService;
 
 import java.util.List;
 @RestController
-@CrossOrigin(origins= {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
+@CrossOrigin(origins= {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th", "http://127.0.0.1:5173"})
 @RequestMapping("/api/category")
 @RequiredArgsConstructor
 public class CategoryController {

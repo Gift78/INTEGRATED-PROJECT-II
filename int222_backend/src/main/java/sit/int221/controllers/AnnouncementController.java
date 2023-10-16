@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/announcements")
-@CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
+@CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th", "http://127.0.0.1:5173"})
 @RequiredArgsConstructor
 public class AnnouncementController {
     private final AnnouncementService announcementService;

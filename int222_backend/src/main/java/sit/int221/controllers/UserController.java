@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th"})
+@CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th", "http://127.0.0.1:5173"})
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -56,8 +56,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Integer id) {
-        userService.deleteUser(id);
+    public void deleteUser(@PathVariable Integer id, @RequestHeader(value = "Authorization") String authorizationHeader) {
+        userService.deleteUser(id, authorizationHeader);
     }
 
     @PostMapping("/match")
