@@ -31,20 +31,34 @@ public class AnnouncementService {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    public List<Announcement> getAllAnnouncement(String authorizationHeader) {
-        String jwt = authorizationHeader.substring(7);
-        UserRole role = UserRole.valueOf(jwtService.extractRole(jwt));
-        Integer userId = jwtService.extractUserId(jwt);
-
-        if (role.equals(UserRole.admin)) {
-            Sort sort = Sort.by(Sort.Direction.DESC, "id");
-            return announcementRepository.findAll(sort);
+    public List<Announcement> getAllAnnouncement(String mode, String authorizationHeader) {
+        if (authorizationHeader == null) {
+            if (Objects.equals(mode, "active")) {
+                List<Announcement> activeAnnouncements = announcementRepository.getActiveAnnouncements(AnnouncementDisplay.Y, ZonedDateTime.now());
+                activeAnnouncements.sort(Comparator.comparing(Announcement::getId).reversed());
+                return activeAnnouncements;
+            } else if (Objects.equals(mode, "close")){
+                List<Announcement> closeAnnouncements = announcementRepository.findAllByCloseDateIsNotNullAndAnnouncementDisplayEqualsAndCloseDateBefore(AnnouncementDisplay.Y, ZonedDateTime.now());
+                closeAnnouncements.sort(Comparator.comparing(Announcement::getId).reversed());
+                return closeAnnouncements;
+            }
         } else {
-            User user = userService.getUser(userId);
-            List<Announcement> announcements = announcementRepository.findAllByAnnouncementOwner(user);
-            announcements.sort(Comparator.comparing(Announcement::getId).reversed());
-            return announcements;
+            String jwt = authorizationHeader.substring(7);
+            UserRole role = UserRole.valueOf(jwtService.extractRole(jwt));
+            Integer userId = jwtService.extractUserId(jwt);
+
+            if (role.equals(UserRole.admin)) {
+                Sort sort = Sort.by(Sort.Direction.DESC, "id");
+                return announcementRepository.findAll(sort);
+            } else {
+                User user = userService.getUser(userId);
+                List<Announcement> announcements = announcementRepository.findAllByAnnouncementOwner(user);
+                announcements.sort(Comparator.comparing(Announcement::getId).reversed());
+                return announcements;
+            }
         }
+
+        return null;
     }
 
     public Announcement getAnnouncement(Integer announcementId, Boolean viewCount, String authorizationHeader) {

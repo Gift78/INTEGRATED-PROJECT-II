@@ -24,8 +24,9 @@ public class AnnouncementController {
     private final ListMapper listMapper;
 
     @GetMapping("")
-    public List<AnnouncementDTO> getAllAnnouncement(@RequestHeader(value = "Authorization") String authorizationHeader) {
-        return listMapper.mapList(announcementService.getAllAnnouncement(authorizationHeader), AnnouncementDTO.class, modelMapper);
+    public List<AnnouncementDTO> getAllAnnouncement(@RequestParam(required = false) String mode,
+                                                    @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        return listMapper.mapList(announcementService.getAllAnnouncement(mode, authorizationHeader), AnnouncementDTO.class, modelMapper);
     }
 
     @GetMapping("/{id}")
