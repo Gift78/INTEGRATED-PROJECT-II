@@ -114,7 +114,7 @@ router.beforeEach((to, from, next) => {
     Swal.fire({
       icon: 'error',
       title: '403 Forbidden',
-      text: "You don't have permission to access this server.",
+      text: "You don't have permission to access this page.",
       confirmButtonColor: '#155e75',
       confirmButtonText: 'Go back',
     }).then((result) => {
