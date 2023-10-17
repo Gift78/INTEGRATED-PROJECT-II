@@ -40,5 +40,9 @@ export const useAuth = defineStore('auth', () => {
         if (isLoggedIn()) return VueJwtDecode.decode(localStorage.getItem("token")).sub
     }
 
-    return { parseJwt, getExpTime, isTokenExpired, isRefreshTokenExpired, isLoggedIn, getRole, getUsername }
+    const getUserId = () => {
+        if (isLoggedIn()) return VueJwtDecode.decode(localStorage.getItem("token")).userId
+    }
+
+    return { parseJwt, getExpTime, isTokenExpired, isRefreshTokenExpired, isLoggedIn, getRole, getUsername, getUserId }
 })

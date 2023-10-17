@@ -7,14 +7,15 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import { formatDatetimeLocal } from '../composable/formatDatetime';
-import VueJwtDecode from 'vue-jwt-decode'
+import { useAuth } from '../stores/auth';
 
+const auth = useAuth()
+const { getUserId } = auth
 const router = useRouter();
 const users = ref([])
-const userLoginId = ref('')
+
 onMounted(async () => {
     users.value = await getAllUsers();
-    userLoginId.value = VueJwtDecode.decode(localStorage.getItem("token")).userId
 });
 
 const deleteUser = async (id) => {
@@ -122,7 +123,7 @@ const showDeleteModal = (adminId, id) => {
                         @click="router.push({ name: 'UserDetail', params: { id: user.id } })">edit</button>
                     <button
                         class="ann-button text-red-400 bg-red-100 hover:bg-red-200 transition-colors duration-200 rounded-lg w-16 h-12 shadow-sm mx-2"
-                        @click="showDeleteModal(userLoginId, user.id)">delete</button>
+                        @click="showDeleteModal(getUserId(), user.id)">delete</button>
                 </div>
             </div>
         </div>
