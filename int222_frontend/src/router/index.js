@@ -99,6 +99,7 @@ router.beforeEach((to, from, next) => {
     next({ name: 'UserAnnouncement' });
   } else if (to.name !== 'UserLogin' && isTokenExpired()) {
     if (isRefreshTokenExpired()) {
+      localStorage.clear();
       next({ name: 'UserAnnouncement' });
     } else {
       getNewToken()
@@ -106,11 +107,11 @@ router.beforeEach((to, from, next) => {
           next({ name: to.name });
         })
         .catch(() => {
+          localStorage.clear();
           next({ name: 'UserAnnouncement' });
         });
     }
-  }
-  else if (isLoggedIn() && getRole() !== 'admin' && (to.name == 'UserListing' || to.name == 'UserMatchPassword')) {
+  } else if (isLoggedIn() && getRole() !== 'admin' && (to.name == 'UserListing' || to.name == 'UserMatchPassword')) {
     Swal.fire({
       icon: 'error',
       title: '403 Forbidden',
@@ -122,8 +123,7 @@ router.beforeEach((to, from, next) => {
         next({ name: 'AdminAnnouncement' });
       }
     })
-  }
-  else {
+  } else {
     next();
   }
 });

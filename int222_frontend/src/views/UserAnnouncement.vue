@@ -12,6 +12,7 @@ import { storeToRefs } from 'pinia'
 import { getAllCategories } from '../composable/getData';
 import { getAnnoucementPageByCategoryId } from '../composable/getData';
 import LoginIcon from "../components/icons/LoginIcon.vue"
+import { useAuth } from '../stores/auth';
 
 const router = useRouter()
 const modeStore = useMode()
@@ -23,7 +24,10 @@ const data = ref([])
 const categoryItem = ref([])
 const selectedCategory = ref('')
 const currentPage = ref(0)
+const auth = useAuth()
+const { isRefreshTokenExpired } = auth
 const buttonText = ref('Login')
+
 onMounted(async () => {
     if (mode.value == 'active') {
         activeButton.value = 'text-white bg-emerald-light'
@@ -34,7 +38,7 @@ onMounted(async () => {
     }
     categoryItem.value = await getAllCategories()
     data.value = await getDataByPage(mode.value, currentPage.value, 5);
-    if (localStorage.getItem("token") !== null) {
+    if (localStorage.getItem("token") !== null && !isRefreshTokenExpired()) {
         buttonText.value = 'Announcement List'
     } else {
         buttonText.value = 'Login'
@@ -82,7 +86,7 @@ const changePageButton = (page) => {
 }
 
 const goToLoginPage = () => {
-    if (localStorage.getItem("token") !== null) {
+    if (localStorage.getItem("token") !== null && !isRefreshTokenExpired()) {
         router.push({ name: "AdminAnnouncement" })
     } else {
         router.push({ name: "UserLogin" })
