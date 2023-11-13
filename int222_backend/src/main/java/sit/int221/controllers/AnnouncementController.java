@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.*;
 import sit.int221.entities.Announcement;
 import sit.int221.services.AnnouncementService;
+import sit.int221.services.SubscriptionService;
 import sit.int221.utils.ListMapper;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnnouncementController {
     private final AnnouncementService announcementService;
+    private final SubscriptionService subscriptionService;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
 
@@ -46,6 +48,13 @@ public class AnnouncementController {
         }
 
         Announcement announcement = announcementService.createAnnouncement(newAnnouncement, authorizationHeader);
+        subscriptionService.sendAnnouncementEmail(announcement.getCategory().getId(), announcement).thenAcceptAsync(unused -> {
+            System.out.println("Email sent successfully");
+        }).exceptionally(e -> {
+            System.out.println("Failed to send email");
+            return null;
+        });
+
         return modelMapper.map(announcement, CreateAndUpdateAnnouncementResponseDTO.class);
     }
 
@@ -59,6 +68,12 @@ public class AnnouncementController {
         }
 
         Announcement announcement = announcementService.updateAnnouncement(id, newAnnouncement, authorizationHeader);
+        subscriptionService.sendAnnouncementEmail(announcement.getCategory().getId(), announcement).thenAcceptAsync(unused -> {
+            System.out.println("Email sent successfully");
+        }).exceptionally(e -> {
+            System.out.println("Failed to send email");
+            return null;
+        });
         return modelMapper.map(announcement, CreateAndUpdateAnnouncementResponseDTO.class);
     }
 
