@@ -155,12 +155,13 @@ const subscribe = async () => {
     }
 }
 
+const isInvalidOTP = ref(false)
 const verifyOTP = async () => {
     const data = {
         email: email.value,
         otp: otp.value,
         categoryIds: chooseCategory.value,
-        action:"subscribe"
+        action: "subscribe"
     }
     console.log(data)
     const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/subscription/verify-otp", {
@@ -172,15 +173,14 @@ const verifyOTP = async () => {
     })
 
     if (response.status === 200) {
+        isInvalidOTP.value = false
         console.log("success")
+        openSubModal.value = false
+        openSecondSubModal.value = false
+        subscribeSuccess()
     } else {
-        const errorData = await response.json();
-        Swal.fire({
-            icon: 'error',
-            title: `Error ${errorData.status}`,
-            text: errorData.message,
-            confirmButtonColor: '#155e75',
-        })
+        isInvalidOTP.value = true
+        otp.value = ''
     }
 }
 
@@ -263,7 +263,7 @@ const verifyOTP = async () => {
                         <div class="flex justify-center mt-2">
                             <div class="font-semibold text-cyan-800 my-auto">Email : </div>
                             <input type="text" placeholder="Your email address." v-model.trim="email" maxlength="150"
-                                class="border border-emerald-plus rounded-lg p-3 w-2/3 ml-5" />
+                                class="border border-emerald-plus rounded-lg p-3 w-2/3 ml-5" @keydown.enter="subscribe()" />
                         </div>
                         <!-- for error -->
                         <div class="flex justify-center text-red-500" v-if="categoryInvalid">
@@ -305,22 +305,14 @@ const verifyOTP = async () => {
                             </div>
                         </div>
                         <div class="flex justify-center mt-5">
-                            <div class="text-cyan-800 font-semibold my-auto mx-5">OTP : </div>
-                            <input type="text" placeholder="OTP" class="border p-2 rounded-s-lg " v-model="otp">
-                            <button @click="verifyOTP()"
-                                class="border border-emerald-plus text-emerald-plus px-3 rounded-e-lg hover:bg-emerald-plus hover:text-white">Verify</button>
+                            <div class="text-cyan-800 font-semibold my-auto mx-3">OTP : </div>
+                            <input type="text" placeholder="OTP" maxlength="6" class="border p-2 rounded-lg" v-model="otp" @keydown.enter="verifyOTP()">
                         </div>
                         <div class="flex justify-center">
-                            <div v-if="false" class="flex justify-center text-red-500">Invalid OTP</div>
-                            <div v-if="true">Didn't receive OTP
-                                <button @click=""
-                                    class="hover:border-b border-cyan-800 font-semibold">
-                                    Resend code({{ 60 }})
-                                </button>
-                            </div>
+                            <div v-if="isInvalidOTP" class="flex justify-center text-red-500">Invalid OTP provided</div>
                         </div>
                         <div class="flex justify-center mt-4">
-                            <button @click="openSubModal = false, openSecondSubModal = false, subscribeSuccess()"
+                            <button @click="verifyOTP()"
                                 class="border flex justify-center border-emerald-plus text-emerald-plus rounded-lg w-40 p-3 hover:bg-emerald-plus hover:text-white transition-colors duration-200">SUBSCRIBE</button>
                         </div>
                     </div>
