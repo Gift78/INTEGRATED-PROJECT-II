@@ -40,7 +40,7 @@ public class EmailService {
         return announcementDescription + "<br><br>" +
                 "<a href=\"" + BASE_URL + "/announcement/" + announcementId + "\">Announcement Link</a>" +
                 "<br>" +
-                "<a href=\"" + BASE_URL + "/subscription/unsubscribe?email=" + email + "&categoryId=" + categoryId + "\">Unsubscribe Link</a>";
+                "<a href=\"" + BASE_URL + "/unsubscribe?email=" + email + "&categoryId=" + categoryId + "\">Unsubscribe Link</a>";
     }
 
     public String getOtpTemplate(String otp) {
