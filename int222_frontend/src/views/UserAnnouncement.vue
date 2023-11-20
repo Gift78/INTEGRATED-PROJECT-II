@@ -161,7 +161,6 @@ const verifyOTP = async () => {
         email: email.value,
         otp: otp.value,
         categoryIds: chooseCategory.value,
-        action: "subscribe"
     }
     console.log(data)
     const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/subscription/verify-otp", {
