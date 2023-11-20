@@ -70,10 +70,7 @@ public class OtpService {
         CompletableFuture<Void> emailSendingFuture = emailService.sendEmail(email, subject, text);
 
         return emailSendingFuture.thenApplyAsync(result -> true)
-                .exceptionally(ex -> {
-                    ex.printStackTrace();
-                    return false;
-                });
+                .exceptionally(ex -> false);
     }
 
     private int getOtpAttempts(String email) {
