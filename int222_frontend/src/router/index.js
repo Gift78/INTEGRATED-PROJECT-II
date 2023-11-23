@@ -10,6 +10,7 @@ import NotFound from "../views/NotFound.vue"
 import UserMatchPassword from "../views/UserMatchPassword.vue"
 import UserLogin from "../views/UserLogin.vue"
 import UserLogout from "../views/UserLogout.vue"
+import Unsubscribe from "../views/Unsubscribe.vue"
 import { useAuth } from '../stores/auth';
 import { getNewToken } from '../composable/getData';
 import Swal from 'sweetalert2';
@@ -87,13 +88,19 @@ const router = createRouter({
       name: "UserLogout",
       component: UserLogout,
     },
+    // Unsubscribe
+    {
+      path: "/unsubscribe",
+      name: "Unsubscribe",
+      component: Unsubscribe,
+    },
   ],
 });
 
 router.beforeEach((to, from, next) => {
   const auth = useAuth();
   const { isTokenExpired, isRefreshTokenExpired, isLoggedIn, getRole } = auth;
-  if (to.name === 'UserAnnouncement' || to.name === 'UserAnnouncementDetail' || to.name === 'UserLogout') {
+  if (to.name === 'UserAnnouncement' || to.name === 'UserAnnouncementDetail' || to.name === 'UserLogout' || to.name === 'Unsubscribe') {
     next();
   } else if (!isLoggedIn() && to.name !== 'UserLogin') {
     next({ name: 'UserAnnouncement' });
