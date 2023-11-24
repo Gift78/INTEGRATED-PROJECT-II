@@ -1,18 +1,18 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch, computed, onUpdated } from 'vue';
 import TimezoneComponent from '../components/TimezoneComponent.vue';
 import Title from '../components/Title.vue';
 import Published from '../components/icons/Published.vue'
 import Unpublished from '../components/icons/Unpublished.vue'
-import { getDataByPage } from '../composable/getData';
 import { formatDatetimeLocal } from '../composable/formatDatetime.js'
 import { useMode } from '../stores/mode';
 import { storeToRefs } from 'pinia'
-import { getAllCategories } from '../composable/getData';
-import { getAnnoucementPageByCategoryId } from '../composable/getData';
 import LoginIcon from "../components/icons/LoginIcon.vue"
 import { useAuth } from '../stores/auth';
+import ArrowRight from '../components/icons/ArrowRight.vue'
+import Swal from 'sweetalert2';
+import { getDataByPage, getAllCategories, getAnnoucementPageByCategoryId } from '../composable/getData';
 
 const router = useRouter()
 const modeStore = useMode()
@@ -30,7 +30,7 @@ const buttonText = ref('Login')
 
 onMounted(async () => {
     if (mode.value == 'active') {
-        activeButton.value = 'text-white bg-emerald-light'
+        activeButton.value = 'text-white bg-emerald-plus'
         closedButton.value = ''
     } else if (mode.value == 'close') {
         closedButton.value = 'text-white bg-red-500'
@@ -65,7 +65,7 @@ const changeMode = async () => {
     toggleMode()
     currentPage.value = 0
     if (mode.value == 'active') {
-        activeButton.value = 'text-white bg-emerald-light'
+        activeButton.value = 'text-white bg-emerald-plus'
         closedButton.value = ''
     } else if (mode.value == 'close') {
         closedButton.value = 'text-white bg-red-500'
@@ -90,6 +90,96 @@ const goToLoginPage = () => {
         router.push({ name: "AdminAnnouncement" })
     } else {
         router.push({ name: "UserLogin" })
+    }
+}
+
+const openSubModal = ref(false)
+const openSecondSubModal = ref(false)
+const subscribeSuccess = () => {
+    Swal.fire({
+        icon: 'success',
+        title: 'Subscribe Success',
+        text: 'You will receive an email when there is an announcement.',
+        confirmButtonColor: '#12C980',
+        confirmButtonText: 'OK',
+    })
+}
+const chooseCategory = ref([])
+const email = ref('')
+const otp = ref('')
+const emailInvalid = ref(false)
+const categoryInvalid = ref(false)
+
+const sendOTP = async () => {
+    const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/subscription/generate-otp", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: email.value,
+        })
+    })
+
+    if (response.status === 200) {
+
+    } else {
+        const errorData = await response.json();
+        Swal.fire({
+            icon: 'error',
+            title: `Error ${errorData.status}`,
+            text: errorData.message,
+            confirmButtonColor: '#155e75',
+        })
+    }
+}
+const subscribe = async () => {
+    console.log(chooseCategory.value)
+    const isEmailValid = computed(() => {
+        const emailRegex = /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
+        return emailRegex.test(email.value);
+    })
+    if (email.value === '' || !isEmailValid.value) {
+        emailInvalid.value = true
+    } else {
+        emailInvalid.value = false
+    }
+    if (chooseCategory.value.length === 0) {
+        categoryInvalid.value = true
+    } else {
+        categoryInvalid.value = false
+    }
+    if (emailInvalid.value === false && categoryInvalid.value === false) {
+        openSecondSubModal.value = true
+        sendOTP()
+    }
+}
+
+const isInvalidOTP = ref(false)
+const verifyOTP = async () => {
+    const data = {
+        email: email.value,
+        otp: otp.value,
+        categoryIds: chooseCategory.value,
+    }
+    console.log(data)
+    const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/subscription/verify-otp", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+
+    if (response.status === 200) {
+        isInvalidOTP.value = false
+        console.log("success")
+        openSubModal.value = false
+        openSecondSubModal.value = false
+        subscribeSuccess()
+    } else {
+        isInvalidOTP.value = true
+        otp.value = ''
     }
 }
 
@@ -120,20 +210,115 @@ const goToLoginPage = () => {
                 </div>
             </div>
             <!-- dropdown-->
-            <div class="flex mt-3">
-                <div class="w-40 text-cyan-800 font-bold pt-3 my-auto">Choose Category :</div>
-                <div class="flex pt-3">
-                    <select class="ann-category-filter select select-bordered w-full max-w-xs font-normal bg-white"
-                        v-model="selectedCategory">
-                        <option value="">ทั้งหมด</option>
-                        <option v-for="category in categoryItem" :value="category.id">
-                            {{ category.categoryName }}
-                        </option>
-                    </select>
+            <div class="flex justify-between mt-5">
+                <div class="flex">
+                    <div class="w-40 text-cyan-800 font-bold my-auto">Choose Category :</div>
+                    <div class="flex">
+                        <select class="ann-category-filter select select-bordered w-full max-w-xs font-normal bg-white"
+                            v-model="selectedCategory">
+                            <option value="">ทั้งหมด</option>
+                            <option v-for="category in categoryItem" :value="category.id">
+                                {{ category.categoryName }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
+                <button @click="openSubModal = true"
+                    class="bg-emerald-plus my-auto text-white px-7 py-2 rounded-lg hover:bg-emerald-light transition-colors duration-200">SUBSCRIBE
+                </button>
             </div>
 
-            <hr class="mt-4 border-2">
+            <!-- modal -->
+            <div v-if="openSubModal" class="fixed inset-0 flex items-center justify-center backdrop-brightness-75">
+                <div class="bg-white w-128 h-100 p-4 rounded-3xl shadow-2xl">
+                    <!-- first modal -->
+                    <div v-if="!openSecondSubModal">
+                        <div class="flex justify-end">
+                            <button @click="openSubModal = false"
+                                class="hover:scale-150 transition-all duration-200 px-3 py-1 hover:bg-slate-50 hover:rounded-full">X</button>
+                        </div>
+                        <div class="text-center text-2xl text-cyan-800 font-semibold mb-5">SUBSCRIBE</div>
+                        <div class="flex justify-center">
+                            <div
+                                class="border-2 border-emerald-plus bg-emerald-plus rounded-full mx-3 px-2 font-semibold text-white">
+                                1</div>
+                            <div class="border-t border-emerald-plus mt-3 w-1/3"></div>
+                            <div
+                                class="border-2 border-emerald-plus rounded-full mx-3 px-2 font-semibold text-emerald-plus">
+                                2
+                            </div>
+                        </div>
+                        <div class="flex justify-center mt-5">
+                            <div class="font-semibold text-cyan-800">Choose Category : </div>
+                            <div class="grid grid-cols-2">
+                                <div class="text-left ml-5 flex mb-2" v-for="category in categoryItem">
+                                    <input type="checkbox" :id="category.id" :value="category.id"
+                                        class="checkbox checkbox-success" v-model="chooseCategory">
+                                    <label :for="category.id" class="text-cyan-800 pl-3">{{ category.categoryName }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center mt-2">
+                            <div class="font-semibold text-cyan-800 my-auto">Email : </div>
+                            <input type="text" placeholder="Your email address." v-model.trim="email" maxlength="150"
+                                class="border border-emerald-plus rounded-lg p-3 w-2/3 ml-5" @keydown.enter="subscribe()" />
+                        </div>
+                        <!-- for error -->
+                        <div class="flex justify-center text-red-500" v-if="categoryInvalid">
+                            Category must be selected*
+                        </div>
+                        <div class="flex justify-center text-red-500" v-if="emailInvalid">
+                            <div>Email must be a well-formed email address*</div>
+                        </div>
+                        <div class="flex justify-center mt-4">
+                            <button @click="subscribe()"
+                                :class="categoryInvalid || emailInvalid ? 'cursor-not-allowed ' : ''"
+                                class="border flex justify-center border-emerald-plus text-emerald-plus rounded-lg w-40 p-3 hover:bg-emerald-plus hover:text-white transition-colors duration-200">
+                                Send OTP
+                                <ArrowRight class="bg-emerald-plus text-white rounded-full ml-3" />
+                            </button>
+                        </div>
+                    </div>
+                    <!-- second modal -->
+                    <div v-else>
+                        <div class="flex justify-end">
+                            <button @click="openSubModal = false, openSecondSubModal = false"
+                                class="hover:scale-150 transition-all duration-200 px-3 py-1 hover:bg-slate-50 hover:rounded-full">X</button>
+                        </div>
+                        <div class="text-center text-2xl text-cyan-800 font-semibold mb-5">SUBSCRIBE</div>
+                        <div class="flex justify-center">
+                            <div
+                                class="border-2 border-emerald-plus rounded-full mx-3 px-2 font-semibold text-emerald-plus">
+                                1
+                            </div>
+                            <div class="border-t border-emerald-plus mt-3 w-1/3"></div>
+                            <div
+                                class="border-2 border-emerald-plus bg-emerald-plus rounded-full mx-3 px-2 font-semibold text-white">
+                                2
+                            </div>
+                        </div>
+                        <div class="text-center px-16 mt-5">
+                            <div class="text-xl font-semibold">Check your email!</div>
+                            <div>Please enter the 6-digit verification code that was sent. The code is valid 5 minutes.
+                            </div>
+                        </div>
+                        <div class="flex justify-center mt-5">
+                            <div class="text-cyan-800 font-semibold my-auto mx-3">OTP : </div>
+                            <input type="text" placeholder="OTP" maxlength="6" class="border p-2 rounded-lg" v-model="otp" @keydown.enter="verifyOTP()">
+                        </div>
+                        <div class="flex justify-center">
+                            <div v-if="isInvalidOTP" class="flex justify-center text-red-500">Invalid OTP provided</div>
+                        </div>
+                        <div class="flex justify-center mt-4">
+                            <button @click="verifyOTP()"
+                                class="border flex justify-center border-emerald-plus text-emerald-plus rounded-lg w-40 p-3 hover:bg-emerald-plus hover:text-white transition-colors duration-200">SUBSCRIBE</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <hr class=" mt-4 border-2">
             <!-- head table -->
             <div class="grid grid-cols-9 my-5">
                 <div class="text-center text-zinc-400">No.</div>
@@ -181,7 +366,8 @@ const goToLoginPage = () => {
                 <!-- next button -->
                 <button class="ann-page-next px-5 py-2 rounded-r-full hover:bg-slate-200"
                     @click="changePageButton(currentPage + 1)" :disabled="currentPage === data.totalPages - 1"
-                    :class="currentPage === data.totalPages - 1 ? 'cursor-not-allowed' : ''">Next &gt;</button>
+                    :class="currentPage === data.totalPages - 1 ? 'cursor-not-allowed' : ''">Next
+                    &gt;</button>
             </div>
         </div>
     </div>
