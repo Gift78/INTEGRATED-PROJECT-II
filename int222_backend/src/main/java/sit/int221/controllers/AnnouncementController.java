@@ -48,12 +48,7 @@ public class AnnouncementController {
         }
 
         Announcement announcement = announcementService.createAnnouncement(newAnnouncement, authorizationHeader);
-        subscriptionService.sendAnnouncementEmail(announcement.getCategory().getId(), announcement).thenAcceptAsync(unused -> {
-            System.out.println("Email sent successfully");
-        }).exceptionally(e -> {
-            System.out.println("Failed to send email");
-            return null;
-        });
+        subscriptionService.sendAnnouncementEmail(announcement.getCategory().getId(), announcement);
 
         return modelMapper.map(announcement, CreateAndUpdateAnnouncementResponseDTO.class);
     }
@@ -68,12 +63,7 @@ public class AnnouncementController {
         }
 
         Announcement announcement = announcementService.updateAnnouncement(id, newAnnouncement, authorizationHeader);
-        subscriptionService.sendAnnouncementEmail(announcement.getCategory().getId(), announcement).thenAcceptAsync(unused -> {
-            System.out.println("Email sent successfully");
-        }).exceptionally(e -> {
-            System.out.println("Failed to send email");
-            return null;
-        });
+        subscriptionService.sendAnnouncementEmail(announcement.getCategory().getId(), announcement);
         return modelMapper.map(announcement, CreateAndUpdateAnnouncementResponseDTO.class);
     }
 

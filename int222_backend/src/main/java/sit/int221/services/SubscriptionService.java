@@ -1,17 +1,23 @@
 package sit.int221.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sit.int221.entities.Announcement;
 import sit.int221.entities.Category;
 import sit.int221.entities.Subscription;
+import sit.int221.entities.UnsubscribeToken;
 import sit.int221.repositories.SubscriptionRepository;
+import sit.int221.repositories.UnsubscribeTokenRepository;
 import sit.int221.utils.AnnouncementDisplay;
 
+import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -23,6 +29,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final CategoryService categoryService;
     private final EmailService emailService;
+    private final UnsubscribeTokenRepository unsubscribeTokenRepository;
 
     public void subscribe(String email, List<Integer> categoryIds) {
         for (Integer categoryId : categoryIds) {
@@ -38,12 +45,10 @@ public class SubscriptionService {
         }
     }
 
-    public void unsubscribe(String email, List<Integer> categoryIds){
-        for (Integer categoryId : categoryIds) {
-            Subscription subscription = subscriptionRepository.findByEmailAndCategoryId(email, categoryId);
-            if (subscription != null) {
-                subscriptionRepository.delete(subscription);
-            }
+    public void unsubscribe(String email, Integer categoryId){
+        Subscription subscription = subscriptionRepository.findByEmailAndCategoryId(email, categoryId);
+        if (subscription != null) {
+            subscriptionRepository.delete(subscription);
         }
     }
 
@@ -57,12 +62,12 @@ public class SubscriptionService {
         }
     }
 
-    public CompletableFuture<Void> sendAnnouncementEmail(Integer categoryId, Announcement announcement) {
+    public void sendAnnouncementEmail(Integer categoryId, Announcement announcement) {
         List<Subscription> subscriptions = subscriptionRepository.findByCategoryId(categoryId);
 
         if (announcement.getAnnouncementDisplay().equals(AnnouncementDisplay.Y)) {
             if (announcement.getPublishDate() == null) {
-                return CompletableFuture.runAsync(() -> {
+                CompletableFuture.runAsync(() -> {
                     subscriptions.forEach(subscription -> emailService.sendSubscriberEmail(subscription.getEmail(), announcement));
                 });
             } else {
@@ -70,10 +75,48 @@ public class SubscriptionService {
                 Executors.newSingleThreadScheduledExecutor().schedule(() -> {
                     subscriptions.forEach(subscription -> emailService.sendSubscriberEmail(subscription.getEmail(), announcement));
                 }, delay, TimeUnit.MILLISECONDS);
-                return CompletableFuture.completedFuture(null);
+                CompletableFuture.completedFuture(null);
             }
+            return;
         }
 
-        return CompletableFuture.completedFuture(null);
+        CompletableFuture.completedFuture(null);
+    }
+
+    public String generateUnsubscribeToken(String email) {
+        UnsubscribeToken existingToken = unsubscribeTokenRepository.findByEmail(email);
+        if (existingToken != null) {
+            unsubscribeTokenRepository.delete(existingToken);
+        }
+
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[24];
+        secureRandom.nextBytes(randomBytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+
+        UnsubscribeToken unsubscribeToken = new UnsubscribeToken();
+        unsubscribeToken.setEmail(email);
+        unsubscribeToken.setToken(token);
+        unsubscribeToken.setGeneratedAt(LocalDateTime.now());
+
+        unsubscribeTokenRepository.save(unsubscribeToken);
+
+        return token;
+    }
+
+    @Transactional
+    public String verifyUnsubscribeToken(String token) {
+        UnsubscribeToken unsubscribeToken = unsubscribeTokenRepository.findByToken(token);
+        if (unsubscribeToken != null && !isUnsubscribeTokenExpired(unsubscribeToken.getGeneratedAt())) {
+            unsubscribeTokenRepository.deleteByToken(token);
+            return unsubscribeToken.getEmail();
+        } else {
+            return null;
+        }
+    }
+
+    private boolean isUnsubscribeTokenExpired(LocalDateTime tokenGeneratedAt) {
+        LocalDateTime now = LocalDateTime.now();
+        return tokenGeneratedAt.isBefore(now.minusDays(30));
     }
 }

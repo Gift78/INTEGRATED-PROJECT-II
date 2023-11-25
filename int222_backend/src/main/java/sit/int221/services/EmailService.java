@@ -32,15 +32,15 @@ public class EmailService {
     }
 
     public void sendSubscriberEmail(String email, Announcement announcement) {
-        String text = getAnnouncementTemplate(email, announcement.getAnnouncementDescription(), announcement.getId());
+        String text = getAnnouncementTemplate(email, announcement.getAnnouncementDescription(), announcement.getId(), announcement.getCategory().getId());
         sendEmail(email, announcement.getAnnouncementTitle(), text);
     }
 
-    public String getAnnouncementTemplate(String email, String announcementDescription, Integer announcementId) {
+    public String getAnnouncementTemplate(String email, String announcementDescription, Integer announcementId, Integer categoryId) {
         return announcementDescription + "<br><br>" +
                 "<a href=\"" + BASE_URL + "/announcement/" + announcementId + "\">Announcement Link</a>" +
                 "<br>" +
-                "<a href=\"" + BASE_URL + "/subscription/unsubscribe?email=" + email + "\">Unsubscribe Link</a>";
+                "<a href=\"" + BASE_URL + "/unsubscribe?email=" + email + "&categoryId=" + categoryId + "\">Unsubscribe Link</a>";
     }
 
     public String getOtpTemplate(String otp) {

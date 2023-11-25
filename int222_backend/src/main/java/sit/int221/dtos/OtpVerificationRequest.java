@@ -15,5 +15,4 @@ public class OtpVerificationRequest {
     private String email;
     private String otp;
     private List<Integer> categoryIds;
-    private String action;
 }

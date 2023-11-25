@@ -6,9 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.OtpRequestDTO;
 import sit.int221.dtos.OtpVerificationRequest;
+import sit.int221.exceptions.OtpRetryLimitExceededException;
 import sit.int221.services.OtpService;
 import sit.int221.services.SubscriptionService;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -22,19 +24,20 @@ public class SubscriptionController {
 
     @PostMapping("/generate-otp")
     public ResponseEntity<?> generateOtp(@RequestBody OtpRequestDTO otpRequest) {
-        String otp = otpService.generateOtp(otpRequest.getEmail());
-        CompletableFuture<Boolean> emailSendingFuture = otpService.sendOtp(otpRequest.getEmail(), otp);
-
         try {
+            String otp = otpService.generateOtp(otpRequest.getEmail());
+            CompletableFuture<Boolean> emailSendingFuture = otpService.sendOtp(otpRequest.getEmail(), otp);
             boolean isEmailSent = emailSendingFuture.get();
 
             if (isEmailSent) {
-                return ResponseEntity.ok("OTP sent successfully");
+                return ResponseEntity.ok(Map.of("message", "OTP sent successfully"));
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send OTP");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to send OTP"));
             }
         } catch (InterruptedException | ExecutionException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send OTP");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to send OTP"));
+        } catch (OtpRetryLimitExceededException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "OTP generation limit exceeded. Please try again after some time."));
         }
     }
 
@@ -43,17 +46,32 @@ public class SubscriptionController {
         boolean isOtpValid = otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
 
         if (isOtpValid) {
-            if (otpRequest.getAction().equals("subscribe")) {
-                subscriptionService.subscribe(otpRequest.getEmail(), otpRequest.getCategoryIds());
+            subscriptionService.subscribe(otpRequest.getEmail(), otpRequest.getCategoryIds());
 
-                CompletableFuture.runAsync(() ->
-                        subscriptionService.sendOtpSubscribeResponseEmail(otpRequest.getEmail(), otpRequest.getCategoryIds()));
-            } else {
-                subscriptionService.unsubscribe(otpRequest.getEmail(), otpRequest.getCategoryIds());
-            }
-            return ResponseEntity.ok("OTP verified successfully");
+            CompletableFuture.runAsync(() ->
+                    subscriptionService.sendOtpSubscribeResponseEmail(otpRequest.getEmail(), otpRequest.getCategoryIds()));
+            return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid OTP"));
         }
+    }
+
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<?> unsubscribe(@RequestBody Map<String, Object> request) {
+        String token = (String) request.get("token");
+        Integer categoryId = (Integer) request.get("categoryId");
+        String email = subscriptionService.verifyUnsubscribeToken(token);
+        if (email != null) {
+            subscriptionService.unsubscribe(email, categoryId);
+            return ResponseEntity.ok(Map.of("message", "Unsubscribed successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid or expired token"));
+        }
+    }
+
+    @PostMapping("/unsubscribe/generate-token")
+    public ResponseEntity<?> generateUnsubscribeToken(@RequestParam String email) {
+        String token = subscriptionService.generateUnsubscribeToken(email);
+        return ResponseEntity.ok(Map.of("token", token));
     }
 }
