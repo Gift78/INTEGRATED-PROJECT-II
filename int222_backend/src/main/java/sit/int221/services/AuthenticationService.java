@@ -30,7 +30,7 @@ public class AuthenticationService {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
-            Map<String, Object> extraClaims = Map.of("userId", user.getId(),"role", user.getRole());
+            Map<String, Object> extraClaims = Map.of("userId", user.getId(),"role", user.getRole(), "email", user.getEmail());
             String token = jwtService.generateToken(extraClaims, user);
             String refreshToken = jwtService.generateRefreshToken(user);
             return new AuthenticationResponseDTO(token, refreshToken);
@@ -54,7 +54,7 @@ public class AuthenticationService {
             if (username != null) {
                 User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
                 if (jwtService.isTokenValid(refreshToken, user)) {
-                    Map<String, Object> extraClaims = Map.of("userId", user.getId(),"role", user.getRole());
+                    Map<String, Object> extraClaims = Map.of("userId", user.getId(),"role", user.getRole(), "email", user.getEmail());
                     String token = jwtService.generateToken(extraClaims, user);
                     return new AuthenticationResponseDTO(token, refreshToken);
                 }
