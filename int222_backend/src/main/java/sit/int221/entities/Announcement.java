@@ -9,6 +9,7 @@ import lombok.Setter;
 import sit.int221.utils.AnnouncementDisplay;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,4 +40,7 @@ public class Announcement {
     @ManyToOne
     @JoinColumn(name = "announcementOwner")
     private User announcementOwner;
+
+    @OneToMany(mappedBy = "announcement", cascade = CascadeType.ALL)
+    private List<File> files;
 }
