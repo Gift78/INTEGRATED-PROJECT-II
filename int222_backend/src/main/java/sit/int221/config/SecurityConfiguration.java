@@ -29,6 +29,7 @@ public class SecurityConfiguration {
             { HttpMethod.GET.toString(), "/api/category" },
             { HttpMethod.POST.toString(), "/api/token" },
             { HttpMethod.POST.toString(), "/api/subscription/**"},
+            { HttpMethod.GET.toString(), "/api/file/**"},
     };
 
     public static boolean isPublicEndpoint(String method, String path) {
