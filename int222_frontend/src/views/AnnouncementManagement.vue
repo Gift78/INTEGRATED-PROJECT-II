@@ -277,7 +277,7 @@ const toastMixin = Swal.mixin({
                         <span class="text-rose-700 pl-1">*</span>
                     </div>
                     <div class="w-full mx-auto">
-                        <QuillEditor theme="snow" toolbar="full" v-model:content="announcement.announcementDescription"
+                        <QuillEditor theme="snow" toolbar="essential" v-model:content="announcement.announcementDescription"
                             content-type="html" class="ann-description h-96" />
                     </div>
                 </div>

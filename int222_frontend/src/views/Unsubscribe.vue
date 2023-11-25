@@ -3,18 +3,20 @@ import { ref, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import unsubIcon from '../components/icons/unsubIcon.vue'
 import { useRoute } from 'vue-router';
-import { getCategoryById } from '../composable/getData.js'
+import { getAllCategories } from '../composable/getData.js'
 
 const { query } = useRoute();
-
-
-const category = ref({})
+const categoryName = ref('')
 onMounted(async () => {
-    category.value = await getCategoryById(query?.categoryId)
+    const category = await getAllCategories()
+    categoryName.value = category.find((cat) => {
+        return cat.id == Number(query?.categoryId)
+    }).categoryName
 })
 
 const token = ref('')
 const generateUnsubToken = async () => {
+    console.log(query)
     const response = await fetch(import.meta.env.VITE_ROOT_API + `/api/subscription/unsubscribe/generate-token?email=${query?.email}`, {
         method: 'POST',
         headers: {
@@ -37,12 +39,12 @@ const unsubscribe = async () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ token: token.value, categoryId: query?.categoryId })
+        body: JSON.stringify({ token: token.value, categoryId: Number(query?.categoryId) })
     })
     if (response.ok) {
         Swal.fire({
             title: 'Unsubscribed!',
-            text: `You have been unsubscribed from ${category.value.categoryName} `,
+            text: `You have been unsubscribed from ${categoryName.value}`,
             icon: 'success',
             confirmButtonText: 'Ok'
         }).then(() => {
@@ -81,7 +83,7 @@ const cancelButton = ()=>{
     <div class="w-full flex justify-center">
         <div class="mt-56">
             <div class="text-4xl text-center">
-                Unsubscribe from {{ category.categoryName}}
+                Unsubscribe from {{ categoryName}}
             </div>
             <div class="text-xl text-center mt-5">
                 are you sure you wish to unsubscribe from this category?
