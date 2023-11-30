@@ -41,7 +41,13 @@ public class FileController {
         MediaType mediaType = MediaType.parseMediaType(mimeType);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
+        if (mimeType.equals("application/pdf") || mimeType.contains("image")) {
+            // Display PDF, PNG, JPEG, and GIF files in the browser
+            headers.setContentDisposition(ContentDisposition.builder("inline").filename(fileName).build());
+        } else {
+            // Download all other file types
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
+        }
 
         return ResponseEntity.ok().headers(headers).contentType(mediaType).body(file);
     }
