@@ -1,7 +1,6 @@
 package sit.int221.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,6 @@ import sit.int221.entities.Announcement;
 import sit.int221.entities.File;
 import sit.int221.exceptions.AnnouncementNotFoundException;
 import sit.int221.repositories.AnnouncementRepository;
-import sit.int221.services.AnnouncementService;
 import sit.int221.services.FileService;
 
 import java.io.IOException;
@@ -26,9 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FileController {
     private final FileService fileService;
-    private final AnnouncementService announcementService;
     private final AnnouncementRepository announcementRepository;
-    private final ModelMapper modelMapper;
 
     @GetMapping("/{fileName:.+}")
     @ResponseBody
@@ -44,14 +40,14 @@ public class FileController {
         return ResponseEntity.ok().contentType(mediaType).body(file);
     }
 
-    @PostMapping("/{announcementId}")
-    public ResponseEntity<?> createAnnouncementWithFiles(@PathVariable Integer announcementId, @RequestPart("files") MultipartFile[] files) {
+    @PostMapping("")
+    public ResponseEntity<?> createAnnouncementWithFiles(@RequestPart("announcementId") Integer announcementId, @RequestPart("files") MultipartFile[] files) {
         fileService.storeFiles(files, announcementId);
         return ResponseEntity.ok(Map.of("message", "You successfully uploaded " + files.length + " files and created a new announcement!"));
     }
 
-    @PutMapping("/{announcementId}")
-    public ResponseEntity<?> updateAnnouncementWithFiles(@PathVariable Integer announcementId, @RequestParam("files") MultipartFile[] files) {
+    @PutMapping("")
+    public ResponseEntity<?> updateAnnouncementWithFiles(@RequestPart("announcementId") Integer announcementId, @RequestPart("files") MultipartFile[] files) {
         Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
         List<File> oldFiles = announcement.getFiles();
         if (oldFiles != null) {
