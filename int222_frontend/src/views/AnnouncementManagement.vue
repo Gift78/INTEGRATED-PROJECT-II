@@ -282,6 +282,16 @@ const toastMixin = Swal.mixin({
                     </div>
                 </div>
 
+                <!-- attachfile -->
+                <div class="flex mt-5">
+                    <div class="w-52 text-cyan-800 font-bold pt-2 my-auto">
+                        Attach File
+                    </div>
+                    <div class="w-full mx-auto">
+                        <input type="file" id="custom-input" class="border-2 p-2 rounded-lg border-dashed file:bg-emerald-plus file:hover:bg-emerald-light 
+                        file:transition-colors file:text-white file:py-4 file:px-3 file:rounded-lg file:border-0" />
+                    </div>
+                </div>
                 <!-- new date & time input -->
                 <div class="flex mt-5">
                     <div class="text-cyan-800 w-40 py-3 font-bold">Publish Date</div>
