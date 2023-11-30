@@ -2,6 +2,8 @@ package sit.int221.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +39,11 @@ public class FileController {
             throw new RuntimeException("Could not determine file type.", e);
         }
         MediaType mediaType = MediaType.parseMediaType(mimeType);
-        return ResponseEntity.ok().contentType(mediaType).body(file);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
+
+        return ResponseEntity.ok().headers(headers).contentType(mediaType).body(file);
     }
 
     @PostMapping("")
