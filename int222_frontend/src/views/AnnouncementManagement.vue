@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onUpdated } from 'vue';
 import { useRoute, useRouter } from "vue-router";
 import Swal from 'sweetalert2';
 import Title from '../components/Title.vue';
@@ -20,6 +20,8 @@ const closeTime = ref('');
 const display = ref(false);
 const categoryId = ref(1);
 const isUpdatePage = ref(false);
+const userFiles = ref([])
+const filesName = ref([])
 
 onMounted(async () => {
     categoryItem.value = await getAllCategories();
@@ -48,6 +50,20 @@ onMounted(async () => {
         }
     }
 });
+onUpdated(() => {
+    const file = document.getElementById('file');
+    if (file) {
+        file.addEventListener('change', (e) => {
+            userFiles.value = []
+            filesName.value = []
+            for (let i = 0; i < e.target.files.length; i++) {
+                userFiles.value.push(e.target.files[i])
+                filesName.value.push(e.target.files[i].name)
+            }
+            console.log(e.target.files)
+        })
+    }
+})
 
 const validateTitle = computed(() => {
     return announcement.value.announcementTitle?.length > 0 && announcement.value.announcementTitle?.length <= 200
@@ -148,7 +164,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
     }
 
     if (isUpdatePage.value === true) {
-        const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements/" + id, {
+        const response = await fetch(import.meta.env.VITE_ROOT_API + `/api/announcements/${id}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem("token")}`,
@@ -156,6 +172,19 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
             },
             body: JSON.stringify(data)
         })
+
+
+        // const formData = new FormData();
+        // formData.append('files', userFiles.value);
+        // formData.append('announcementId', id);
+        // const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file` ,{
+        //     method: 'POST',
+        //     headers: {
+        //         'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: formData
+        // })
 
         if (response.ok) {
             Swal.fire({
@@ -284,12 +313,40 @@ const toastMixin = Swal.mixin({
 
                 <!-- attachfile -->
                 <div class="flex mt-5">
-                    <div class="w-52 text-cyan-800 font-bold pt-2 my-auto">
+                    <div class="w-44 text-cyan-800 font-bold pt-2 mt-3">
                         Attach File
                     </div>
-                    <div class="w-full mx-auto">
-                        <input type="file" id="custom-input" class="border-2 p-2 rounded-lg border-dashed file:bg-emerald-plus file:hover:bg-emerald-light 
-                        file:transition-colors file:text-white file:py-4 file:px-3 file:rounded-lg file:border-0" />
+                    <div>
+                        <div class="flex-col" v-if="filesName?.length == 0">
+                            <label for="file"
+                                class="flex hover:cursor-pointer border-2 py-1 px-1 rounded-lg border-dashed ">
+                                <div
+                                    class="bg-emerald-plus hover:bg-emerald-light hover:transition-colors text-white py-2 px-4 rounded-md">
+                                    Upload</div>
+                                <div class="my-auto w-60 px-10 truncate text-zinc-400">
+                                    Add an file here</div>
+                            </label>
+                            <input type="file" id="file" multiple hidden
+                                class="border-2 p-2 rounded-lg border-dashed text-zinc-400 file:bg-emerald-plus file:hover:bg-emerald-light 
+                            file:transition-colors file:text-white file:py-3 file:px-3 file:mr-6 file:rounded-lg file:border-0" />
+                        </div>
+                        <div v-for="file in filesName" class="flex-col">
+                            <div class="flex mb-2">
+                                <label for="file"
+                                    class="flex hover:cursor-pointer border-2 py-1 px-1 rounded-lg border-dashed ">
+                                    <div
+                                        class="bg-emerald-plus hover:bg-emerald-light hover:transition-colors text-white py-2 px-4 rounded-md">
+                                        Upload</div>
+                                    <div class="my-auto w-60 px-10 truncate text-zinc-400">
+                                        {{ file }}</div>
+                                </label>
+                                <button @click="filesName.splice(filesName.indexOf(file), 1), userFiles.splice(filesName.indexOf(file), 1)"
+                                    class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-2">clear</button>
+                            </div>
+                            <input type="file" id="file" multiple hidden
+                                class="border-2 p-2 rounded-lg border-dashed text-zinc-400 file:bg-emerald-plus file:hover:bg-emerald-light 
+                            file:transition-colors file:text-white file:py-3 file:px-3 file:mr-6 file:rounded-lg file:border-0" />
+                        </div>
                     </div>
                 </div>
                 <!-- new date & time input -->
