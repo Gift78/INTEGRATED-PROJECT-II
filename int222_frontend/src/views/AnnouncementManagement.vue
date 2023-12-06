@@ -50,20 +50,43 @@ onMounted(async () => {
         }
     }
 });
-onUpdated(() => {
+
+
+document.addEventListener('DOMContentLoaded', function () {
     const file = document.getElementById('file');
     if (file) {
         file.addEventListener('change', (e) => {
-            userFiles.value = []
-            filesName.value = []
-            for (let i = 0; i < e.target.files.length; i++) {
-                userFiles.value.push(e.target.files[i])
-                filesName.value.push(e.target.files[i].name)
+            if (userFiles.value.length + e.target.files.length > 5) {
+                const maxFiles = 5 - userFiles.value.length;
+                for (let i = 0; i < maxFiles; i++) {
+                    if (e.target.files[i] != userFiles.value[i]) {
+                        userFiles.value.push(e.target.files[i])
+                        filesName.value.push(e.target.files[i].name)
+                    }
+                }
+                toastMixin.fire({
+                    title: 'Error',
+                    text: 'The announcement can have at most 5 attachments',
+                });
+            } else {
+                for (let i = 0; i < e.target.files.length; i++) {
+                    if (e.target.files[i].size > 20000000) {
+                        toastMixin.fire({
+                            title: 'Error',
+                            text: 'The files size cannot be larger than 20 MB',
+                        });
+                    } else {
+                        if (e.target.files[i] != userFiles.value[i]) {
+                            userFiles.value.push(e.target.files[i])
+                            filesName.value.push(e.target.files[i].name)
+                        }
+                    }
+                }
             }
-            console.log(e.target.files)
         })
     }
-})
+});
+
 
 const validateTitle = computed(() => {
     return announcement.value.announcementTitle?.length > 0 && announcement.value.announcementTitle?.length <= 200
@@ -154,6 +177,12 @@ const getCategoryId = (categoryName) => {
 }
 
 const AddEditAnnouncement = async (editedAnnounce, id) => {
+    // const formData = new FormData();
+    // for (let i = 0; i < userFiles.value.length; i++) {
+    //     formData.append('files', userFiles.value[i]);
+    // }
+    // formData.append('announcementId', id);
+    // console.log(formData)
     const data = {
         announcementTitle: editedAnnounce.announcementTitle,
         announcementDescription: editedAnnounce.announcementDescription,
@@ -172,20 +201,6 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
             },
             body: JSON.stringify(data)
         })
-
-
-        // const formData = new FormData();
-        // formData.append('files', userFiles.value);
-        // formData.append('announcementId', id);
-        // const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file` ,{
-        //     method: 'POST',
-        //     headers: {
-        //         'Authorization': `Bearer ${localStorage.getItem("token")}`,
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: formData
-        // })
-
         if (response.ok) {
             Swal.fire({
                 icon: 'success',
@@ -213,6 +228,15 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
             },
             body: JSON.stringify(data)
         })
+
+        // const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file` ,{
+        //     method: 'POST',
+        //     headers: {
+        //         'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: formData
+        // })
 
         if (response.ok) {
             Swal.fire({
@@ -262,6 +286,18 @@ const toastMixin = Swal.mixin({
         toast.addEventListener('mouseleave', Swal.resumeTimer)
     }
 });
+
+
+const test =()=>{
+    const form = document.getElementById('form');
+    const formData = new FormData(form);
+    console.log(userFiles.value[0])
+    for (let i = 0; i < userFiles.value.length; i++) {
+        formData.append('files', userFiles.value[i]);
+    }
+    formData.append('announcementId', 1);
+    console.log(formData)
+}
 </script>
 
 <template>
@@ -275,127 +311,122 @@ const toastMixin = Swal.mixin({
             <Title text="Announcement Detail" />
             <TimezoneComponent />
             <hr class="mt-4 border-2">
-
-            <!-- content -->
-            <div class="ann-item bg-white flex-col rounded-lg p-10 shadow-lg mt-5" v-if="announcement">
-                <div class="flex">
-                    <div class="w-52 text-cyan-800 font-bold pt-2">
-                        Title
-                        <span class="text-rose-700 pl-1">*</span>
-                    </div>
-                    <input type="text" class="ann-title h-10 w-full bg-white rounded-lg pl-4 border" maxlength="200"
-                        v-model="announcement.announcementTitle" />
-                </div>
-                <div class="flex mt-5">
-                    <div class="w-44 text-cyan-800 font-bold pt-3">
-                        Category
-                        <span class="text-rose-700 pl-1">*</span>
-                    </div>
-
-                    <!-- dropdown button -->
-                    <select class="ann-category select select-bordered bg-white" v-model="categoryId">
-                        <option v-for="category in categoryItem" :value="category.id">
-                            {{ category.categoryName }}
-                        </option>
-                    </select>
-                </div>
-                <!-- Description -->
-                <div class="flex mt-5">
-                    <div class="w-52 text-cyan-800 font-bold pt-2">
-                        Description
-                        <span class="text-rose-700 pl-1">*</span>
-                    </div>
-                    <div class="w-full mx-auto">
-                        <QuillEditor theme="snow" toolbar="essential" v-model:content="announcement.announcementDescription"
-                            content-type="html" class="ann-description h-96" />
-                    </div>
-                </div>
-
-                <!-- attachfile -->
-                <div class="flex mt-5">
-                    <div class="w-44 text-cyan-800 font-bold pt-2 mt-3">
-                        Attach File
-                    </div>
-                    <div>
-                        <div class="flex-col" v-if="filesName?.length == 0">
-                            <label for="file"
-                                class="flex hover:cursor-pointer border-2 py-1 px-1 rounded-lg border-dashed ">
-                                <div
-                                    class="bg-emerald-plus hover:bg-emerald-light hover:transition-colors text-white py-2 px-4 rounded-md">
-                                    Upload</div>
-                                <div class="my-auto w-60 px-10 truncate text-zinc-400">
-                                    Add an file here</div>
-                            </label>
-                            <input type="file" id="file" multiple hidden
-                                class="border-2 p-2 rounded-lg border-dashed text-zinc-400 file:bg-emerald-plus file:hover:bg-emerald-light 
-                            file:transition-colors file:text-white file:py-3 file:px-3 file:mr-6 file:rounded-lg file:border-0" />
+            <!-- <form @submit.prevent="AddEditAnnouncement(announcement, params?.id)"> -->
+            <form @submit.prevent="test()" id="form">
+                <!-- content -->
+                <div class="ann-item bg-white flex-col rounded-lg p-10 shadow-lg mt-5" v-if="announcement">
+                    <div class="flex">
+                        <div class="w-52 text-cyan-800 font-bold pt-2">
+                            Title
+                            <span class="text-rose-700 pl-1">*</span>
                         </div>
-                        <div v-for="file in filesName" class="flex-col">
-                            <div class="flex mb-2">
+                        <input type="text" class="ann-title h-10 w-full bg-white rounded-lg pl-4 border" maxlength="200"
+                            v-model="announcement.announcementTitle" />
+                    </div>
+                    <div class="flex mt-5">
+                        <div class="w-44 text-cyan-800 font-bold pt-3">
+                            Category
+                            <span class="text-rose-700 pl-1">*</span>
+                        </div>
+
+                        <!-- dropdown button -->
+                        <select class="ann-category select select-bordered bg-white" v-model="categoryId">
+                            <option v-for="category in categoryItem" :value="category.id">
+                                {{ category.categoryName }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Description -->
+                    <div class="flex mt-5">
+                        <div class="w-52 text-cyan-800 font-bold pt-2">
+                            Description
+                            <span class="text-rose-700 pl-1">*</span>
+                        </div>
+                        <div class="w-full mx-auto">
+                            <QuillEditor theme="snow" toolbar="essential"
+                                v-model:content="announcement.announcementDescription" content-type="html"
+                                class="ann-description h-96" />
+                        </div>
+                    </div>
+
+                    <!-- attachfile -->
+                    <div class="flex mt-5">
+                        <div class="w-44 text-cyan-800 font-bold pt-2 mt-3">
+                            Attach File
+                        </div>
+                        <div>
+                            <div class="flex-col">
+
                                 <label for="file"
                                     class="flex hover:cursor-pointer border-2 py-1 px-1 rounded-lg border-dashed ">
                                     <div
                                         class="bg-emerald-plus hover:bg-emerald-light hover:transition-colors text-white py-2 px-4 rounded-md">
                                         Upload</div>
                                     <div class="my-auto w-60 px-10 truncate text-zinc-400">
-                                        {{ file }}</div>
+                                        Add an file here</div>
                                 </label>
-                                <button @click="filesName.splice(filesName.indexOf(file), 1), userFiles.splice(filesName.indexOf(file), 1)"
-                                    class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-2">clear</button>
-                            </div>
-                            <input type="file" id="file" multiple hidden
-                                class="border-2 p-2 rounded-lg border-dashed text-zinc-400 file:bg-emerald-plus file:hover:bg-emerald-light 
+                                <input type="file" id="file" multiple hidden
+                                    class="border-2 p-2 rounded-lg border-dashed text-zinc-400 file:bg-emerald-plus file:hover:bg-emerald-light 
                             file:transition-colors file:text-white file:py-3 file:px-3 file:mr-6 file:rounded-lg file:border-0" />
+                            </div>
+                            <div v-for="file in filesName" class="flex-col">
+                                <div class="flex my-3">
+                                    <div class="border-2 border-dashed rounded-lg p-3 w-96">{{ file }}</div>
+                                    <button
+                                        @click="filesName.splice(filesName.indexOf(file), 1), userFiles.splice(filesName.indexOf(file), 1)"
+                                        class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-5">clear</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- new date & time input -->
-                <div class="flex mt-5">
-                    <div class="text-cyan-800 w-40 py-3 font-bold">Publish Date</div>
-                    <div class="flex ml-1">
-                        <input type="date" class="ann-publish-date bg-white mx-3 border-2 rounded-lg px-10 py-2"
-                            v-model="publishDate" @change="setDefualtValueCloseTimeAndPublishTime()">
-                        <input type="time" class="ann-publish-time bg-white mx-3 border-2 rounded-lg px-10 py-2"
-                            v-model="publishTime" :disabled="disablePublishTime"
-                            :class="disablePublishTime ? 'cursor-not-allowed text-zinc-300' : ''">
+                    <!-- new date & time input -->
+                    <div class="flex mt-5">
+                        <div class="text-cyan-800 w-40 py-3 font-bold">Publish Date</div>
+                        <div class="flex ml-1">
+                            <input type="date" class="ann-publish-date bg-white mx-3 border-2 rounded-lg px-10 py-2"
+                                v-model="publishDate" @change="setDefualtValueCloseTimeAndPublishTime()">
+                            <input type="time" class="ann-publish-time bg-white mx-3 border-2 rounded-lg px-10 py-2"
+                                v-model="publishTime" :disabled="disablePublishTime"
+                                :class="disablePublishTime ? 'cursor-not-allowed text-zinc-300' : ''">
+                        </div>
+                    </div>
+                    <div class="flex mt-5">
+                        <div class="text-cyan-800 w-40 py-3 font-bold">Close Date</div>
+                        <div class="flex ml-1">
+                            <input type="date" class="ann-close-date bg-white mx-3 border-2 rounded-lg px-10 py-2"
+                                v-model="closeDate" @change="setDefualtValueCloseTimeAndPublishTime()">
+                            <input type="time" class="ann-close-time bg-white mx-3 border-2 rounded-lg px-10 py-2"
+                                v-model="closeTime" :disabled="disableCloseTime"
+                                :class="disableCloseTime ? 'cursor-not-allowed text-zinc-300' : ''">
+                        </div>
+                    </div>
+
+                    <div class="flex mt-5">
+                        <div class="w-44 text-cyan-800 font-bold pt-2">Display</div>
+                        <label class="cursor-pointer label">
+                            <input type="checkbox" id="display" class="ann-display checkbox checkbox-success"
+                                v-model="display" :checked="display" />
+                            <label for="display" class="ml-5 text-cyan-800">Check to show this announcement.</label>
+                        </label>
                     </div>
                 </div>
-                <div class="flex mt-5">
-                    <div class="text-cyan-800 w-40 py-3 font-bold">Close Date</div>
-                    <div class="flex ml-1">
-                        <input type="date" class="ann-close-date bg-white mx-3 border-2 rounded-lg px-10 py-2"
-                            v-model="closeDate" @change="setDefualtValueCloseTimeAndPublishTime()">
-                        <input type="time" class="ann-close-time bg-white mx-3 border-2 rounded-lg px-10 py-2"
-                            v-model="closeTime" :disabled="disableCloseTime"
-                            :class="disableCloseTime ? 'cursor-not-allowed text-zinc-300' : ''">
-                    </div>
+
+                <!-- button -->
+                <div class="flex justify-end mt-3 space-x-3 " v-if="announcement">
+                    <button
+                        class="ann-button text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg transition-colors duration-300 w-28 h-12 ml-5 rounded-lg"
+                        @click="showBackButtonConfirmation()">
+                        Back
+                    </button>
+
+                    <button type="submit"
+                        class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg transition-colors duration-300 w-28 h-12 rounded-lg"
+                        :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
+                        :disabled="!isSubmitAllowed">
+                        {{ isUpdatePage ? 'Update' : 'Add' }}
+                    </button>
                 </div>
-
-                <div class="flex mt-5">
-                    <div class="w-44 text-cyan-800 font-bold pt-2">Display</div>
-                    <label class="cursor-pointer label">
-                        <input type="checkbox" id="display" class="ann-display checkbox checkbox-success" v-model="display"
-                            :checked="display" />
-                        <label for="display" class="ml-5 text-cyan-800">Check to show this announcement.</label>
-                    </label>
-                </div>
-            </div>
-
-            <!-- button -->
-            <div class="flex justify-end mt-3 space-x-3 " v-if="announcement">
-                <button
-                    class="ann-button text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg transition-colors duration-300 w-28 h-12 ml-5 rounded-lg"
-                    @click="showBackButtonConfirmation()">
-                    Back
-                </button>
-
-                <button
-                    class="ann-button text-white bg-emerald-plus hover:bg-emerald-light border-0 shadow-lg transition-colors duration-300 w-28 h-12 rounded-lg"
-                    :class="{ 'opacity-50 cursor-not-allowed': !isSubmitAllowed, 'cursor-pointer': isSubmitAllowed }"
-                    :disabled="!isSubmitAllowed" @click="AddEditAnnouncement(announcement, params?.id)">
-                    {{ isUpdatePage ? 'Update' : 'Add' }}
-                </button>
-            </div>
+            </form>
         </div>
     </div>
 </template>
