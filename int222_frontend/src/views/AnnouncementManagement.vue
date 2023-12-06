@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, computed, onUpdated } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from "vue-router";
 import Swal from 'sweetalert2';
 import Title from '../components/Title.vue';
 import TimezoneComponent from '../components/TimezoneComponent.vue';
 import NavbarComponent from '../components/NavbarComponent.vue'
-import { getDataAdminById, getAllCategories } from '../composable/getData.js';
-import { getFormattedDate, getFormattedTime, getFormattedDateTimeISO } from '../composable/formatDatetime.js';
+import { getDataAdminById, getAllCategories } from '@/composable/getData';
+import { getFormattedDate, getFormattedTime, getFormattedDateTimeISO } from '@/composable/formatDatetime';
 
 const params = useRoute().params;
 const router = useRouter();
@@ -34,11 +34,7 @@ onMounted(async () => {
         closeTime.value = getFormattedTime(announcement.value.closeDate);
         categoryId.value = getCategoryId(announcement.value.announcementCategory);
 
-        if (announcement.value.announcementDisplay === 'Y') {
-            display.value = true;
-        } else {
-            display.value = false;
-        }
+        display.value = announcement.value.announcementDisplay === 'Y';
     } else {
         isUpdatePage.value = false;
         announcement.value = {
@@ -59,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (userFiles.value.length + e.target.files.length > 5) {
                 const maxFiles = 5 - userFiles.value.length;
                 for (let i = 0; i < maxFiles; i++) {
-                    if (e.target.files[i] != userFiles.value[i]) {
+                    if (e.target.files[i] !== userFiles.value[i]) {
                         userFiles.value.push(e.target.files[i])
                         filesName.value.push(e.target.files[i].name)
                     }
@@ -76,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             text: 'The files size cannot be larger than 20 MB',
                         });
                     } else {
-                        if (e.target.files[i] != userFiles.value[i]) {
+                        if (e.target.files[i] !== userFiles.value[i]) {
                             userFiles.value.push(e.target.files[i])
                             filesName.value.push(e.target.files[i].name)
                         }
@@ -156,11 +152,11 @@ const isSubmitAllowed = computed(() => {
 })
 
 const disableCloseTime = computed(() => {
-    return closeDate.value == null || closeDate.value == undefined || closeDate.value == ''
+    return closeDate.value === null || closeDate.value === undefined || closeDate.value === ''
 })
 
 const disablePublishTime = computed(() => {
-    return publishDate.value == null || publishDate.value == undefined || publishDate.value == ''
+    return publishDate.value === null || publishDate.value === undefined || publishDate.value === ''
 })
 
 const publishDateTime = computed(() => {
@@ -245,15 +241,16 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
         const form = document.getElementById('form');
         const formData = new FormData(form);
         for (let i = 0; i < userFiles.value.length; i++) {
-            formData.append('files', userFiles.value[i]);
+          let blob = new Blob([userFiles.value[i]], { type: 'application/octet-stream' });
+          formData.append('files', blob, userFiles.value[i].name);
         }
-        formData.append('announcementId', response_post.id);
+        let blob = new Blob([response_post.id], { type: 'application/json' });
+        formData.append('announcementId', blob, 'announcementId');
 
         const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem("token")}`,
-                'Content-Type': 'multipart/form-data'
             },
             body: formData
         })
