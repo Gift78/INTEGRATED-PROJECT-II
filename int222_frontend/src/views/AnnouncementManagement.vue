@@ -177,12 +177,6 @@ const getCategoryId = (categoryName) => {
 }
 
 const AddEditAnnouncement = async (editedAnnounce, id) => {
-    // const formData = new FormData();
-    // for (let i = 0; i < userFiles.value.length; i++) {
-    //     formData.append('files', userFiles.value[i]);
-    // }
-    // formData.append('announcementId', id);
-    // console.log(formData)
     const data = {
         announcementTitle: editedAnnounce.announcementTitle,
         announcementDescription: editedAnnounce.announcementDescription,
@@ -229,15 +223,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
             body: JSON.stringify(data)
         })
 
-        // const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file` ,{
-        //     method: 'POST',
-        //     headers: {
-        //         'Authorization': `Bearer ${localStorage.getItem("token")}`,
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: formData
-        // })
-
+        const response_post = await response.json()
         if (response.ok) {
             Swal.fire({
                 icon: 'success',
@@ -249,6 +235,32 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
             })
         } else {
             const errorData = await response.json();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error ' + errorData.status,
+                text: errorData.message,
+                confirmButtonColor: '#155e75',
+            })
+        }
+        const form = document.getElementById('form');
+        const formData = new FormData(form);
+        for (let i = 0; i < userFiles.value.length; i++) {
+            formData.append('files', userFiles.value[i]);
+        }
+        formData.append('announcementId', response_post.id);
+
+        const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                'Content-Type': 'multipart/form-data'
+            },
+            body: formData
+        })
+        if (responseUploadFile.ok) {
+            console.log('upload file success')
+        } else {
+            const errorData = await responseUploadFile.json();
             Swal.fire({
                 icon: 'error',
                 title: 'Error ' + errorData.status,
@@ -286,18 +298,6 @@ const toastMixin = Swal.mixin({
         toast.addEventListener('mouseleave', Swal.resumeTimer)
     }
 });
-
-
-const test =()=>{
-    const form = document.getElementById('form');
-    const formData = new FormData(form);
-    console.log(userFiles.value[0])
-    for (let i = 0; i < userFiles.value.length; i++) {
-        formData.append('files', userFiles.value[i]);
-    }
-    formData.append('announcementId', 1);
-    console.log(formData)
-}
 </script>
 
 <template>
@@ -311,8 +311,7 @@ const test =()=>{
             <Title text="Announcement Detail" />
             <TimezoneComponent />
             <hr class="mt-4 border-2">
-            <!-- <form @submit.prevent="AddEditAnnouncement(announcement, params?.id)"> -->
-            <form @submit.prevent="test()" id="form">
+            <form id="form" @submit.prevent="AddEditAnnouncement(announcement, params?.id)" enctype="multipart/form-data">
                 <!-- content -->
                 <div class="ann-item bg-white flex-col rounded-lg p-10 shadow-lg mt-5" v-if="announcement">
                     <div class="flex">
