@@ -7,9 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.entities.Category;
+import sit.int221.entities.File;
 import sit.int221.utils.AnnouncementDisplay;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,5 +38,12 @@ public class AnnouncementDTO {
     @JsonProperty("announcementOwner")
     public String getAnnouncementOwner() {
         return announcementOwner.getUsername();
+    }
+
+    @JsonIgnore
+    private List<File> files;
+    @JsonProperty("files")
+    public List<String> getFiles() {
+        return files.stream().map(File::getOriginalFileName).toList();
     }
 }
