@@ -105,7 +105,7 @@ const downloadFile = async (fileName) => {
                     <div class="w-52 text-cyan-800 font-bold">Display</div>
                     <div class="ann-display text-cyan-800 w-full">{{ data?.announcementDisplay }}</div>
                 </div>
-                <div class="flex mt-5">
+                <div class="flex mt-5" v-if="data.files?.length !== 0">
                     <div class="w-52 text-cyan-800 font-bold">File Uploaded</div>
                     <div class="flex-col w-full">
                         <div v-for="file in data.files">

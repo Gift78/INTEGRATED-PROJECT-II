@@ -19,6 +19,7 @@ const { mode } = storeToRefs(modeStore);
 
 onMounted(async () => {
     data.value = await getDataUserById(params?.id, true)
+    console.log(data.value)
 
     if (data.value === undefined || data.value === null) {
         Swal.fire({
@@ -92,7 +93,7 @@ const downloadFile = async (fileName) => {
             <!-- description -->
             <div class="ql-editor mx-12" v-html="data?.announcementDescription"></div>
             <!-- file -->
-            <div class="text-cyan-800 mx-12 mt-10">
+            <div class="text-cyan-800 mx-12 mt-10" v-if="data.files?.length !== 0">
                 <div v-for="file in data?.files" class="flex-col">
                     <button @click="downloadFile(file)"
                         class="flex justify-between rounded-lg bg-zinc-100 mb-2 hover:bg-zinc-200 transition-colors">
