@@ -9,6 +9,7 @@ import { formatDatetimeLocal } from '../composable/formatDatetime';
 import { storeToRefs } from 'pinia'
 import { getDataUserById } from '../composable/getData';
 import Swal from 'sweetalert2'
+import DownloadIcon from '../components/icons/DownloadIcon.vue';
 
 const router = useRouter();
 const params = useRoute().params;
@@ -18,7 +19,7 @@ const { mode } = storeToRefs(modeStore);
 
 onMounted(async () => {
     data.value = await getDataUserById(params?.id, true)
-    
+
     if (data.value === undefined || data.value === null) {
         Swal.fire({
             icon: 'error',
@@ -26,10 +27,35 @@ onMounted(async () => {
             text: 'Sorry, the request page is not available',
             confirmButtonColor: '#155e75',
         }).then(() => {
-            router.push({name: 'UserAnnouncement'})
+            router.push({ name: 'UserAnnouncement' })
         })
     }
 })
+
+const downloadFile = async (fileName) => {
+    if (fileName) {
+        const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/file/${fileName}?announcementId=${params?.id}`, {
+            method: 'GET',
+        })
+        if (res.ok) {
+            const blob = await res.blob()
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', fileName)
+            document.body.appendChild(link)
+            link.click()
+            link.parentNode.removeChild(link)
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Sorry, the file is not available',
+                confirmButtonColor: '#155e75',
+            })
+        }
+    }
+}
 </script>
 
 <template>
@@ -63,12 +89,24 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
-
-            <div class="ql-editor" v-html="data?.announcementDescription"></div>
+            <!-- description -->
+            <div class="ql-editor mx-12" v-html="data?.announcementDescription"></div>
+            <!-- file -->
+            <div class="text-cyan-800 mx-12 mt-10">
+                <div v-for="file in data?.files" class="flex-col">
+                    <button @click="downloadFile(file)"
+                        class="flex justify-between rounded-lg bg-zinc-100 mb-2 hover:bg-zinc-200 transition-colors">
+                        <div class=" px-5 py-2">{{ file }}</div>
+                        <DownloadIcon class="my-auto mr-5" />
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div v-if="data" class="flex justify-end mt-4">
-            <button class="ann-button bg-cyan-800 hover:bg-cyan-600 text-white rounded-lg py-2 px-6 transition-colors duration-200" @click="router.push({name: 'UserAnnouncement'})">
+            <button
+                class="ann-button bg-cyan-800 hover:bg-cyan-600 text-white rounded-lg py-2 px-6 transition-colors duration-200"
+                @click="router.push({ name: 'UserAnnouncement' })">
                 Back
             </button>
         </div>

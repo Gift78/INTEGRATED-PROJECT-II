@@ -241,8 +241,8 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
         const form = document.getElementById('form');
         const formData = new FormData(form);
         for (let i = 0; i < userFiles.value.length; i++) {
-          let blob = new Blob([userFiles.value[i]], { type: 'application/octet-stream' });
-          formData.append('files', blob, userFiles.value[i].name);
+            let blob = new Blob([userFiles.value[i]], { type: 'application/octet-stream' });
+            formData.append('files', blob, userFiles.value[i].name);
         }
         let blob = new Blob([response_post.id], { type: 'application/json' });
         formData.append('announcementId', blob, 'announcementId');
@@ -269,19 +269,24 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
 }
 
 const showBackButtonConfirmation = () => {
-    Swal.fire({
-        icon: 'warning',
-        title: 'Are you sure?',
-        text: "You will lose all the changes you made!",
-        confirmButtonColor: '#155e75',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, go back',
-        cancelButtonText: 'No, keep it'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            router.push({ name: 'AdminAnnouncement' })
-        }
-    })
+    if (announcement.value.announcementDescription !== "" || announcement.value.announcementTitle !== "" || announcement.value.closeDate !== "" || announcement.value.publishDate !== "") {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Are you sure?',
+            text: "You will lose all the changes you made!",
+            confirmButtonColor: '#155e75',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, go back',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.push({ name: 'AdminAnnouncement' })
+            }
+        })
+    } else {
+        router.push({ name: 'AdminAnnouncement' })
+    }
+
 }
 
 const toastMixin = Swal.mixin({
@@ -409,7 +414,7 @@ const toastMixin = Swal.mixin({
 
                 <!-- button -->
                 <div class="flex justify-end mt-3 space-x-3 " v-if="announcement">
-                    <button
+                    <button type="reset"
                         class="ann-button text-white bg-red-500 hover:bg-red-400 border-0 shadow-lg transition-colors duration-300 w-28 h-12 ml-5 rounded-lg"
                         @click="showBackButtonConfirmation()">
                         Back
