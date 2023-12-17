@@ -9,7 +9,7 @@ import { formatDatetimeLocal } from '../composable/formatDatetime';
 import { storeToRefs } from 'pinia'
 import { getDataUserById } from '../composable/getData';
 import Swal from 'sweetalert2'
-import DownloadIcon from '../components/icons/DownloadIcon.vue';
+import FileBarComponent from '../components/FileBarComponent.vue';
 
 const router = useRouter();
 const params = useRoute().params;
@@ -33,30 +33,6 @@ onMounted(async () => {
     }
 })
 
-const downloadFile = async (fileName) => {
-    if (fileName) {
-        const res = await fetch(import.meta.env.VITE_ROOT_API + `/api/file/${fileName}?announcementId=${params?.id}`, {
-            method: 'GET',
-        })
-        if (res.ok) {
-            const blob = await res.blob()
-            const url = window.URL.createObjectURL(blob)
-            const link = document.createElement('a')
-            link.href = url
-            link.setAttribute('download', fileName)
-            document.body.appendChild(link)
-            link.click()
-            link.parentNode.removeChild(link)
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Sorry, the file is not available',
-                confirmButtonColor: '#155e75',
-            })
-        }
-    }
-}
 </script>
 
 <template>
@@ -95,11 +71,7 @@ const downloadFile = async (fileName) => {
             <!-- file -->
             <div class="text-cyan-800 mx-12 mt-10" v-if="data.files?.length !== 0">
                 <div v-for="file in data?.files" class="flex-col">
-                    <button @click="downloadFile(file)"
-                        class="flex justify-between rounded-lg bg-zinc-100 mb-2 hover:bg-zinc-200 transition-colors">
-                        <div class=" px-5 py-2">{{ file }}</div>
-                        <DownloadIcon class="my-auto mr-5" />
-                    </button>
+                    <FileBarComponent :file="file" />
                 </div>
             </div>
         </div>
