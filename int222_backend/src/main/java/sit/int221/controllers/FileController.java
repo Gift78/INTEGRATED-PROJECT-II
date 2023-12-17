@@ -27,8 +27,12 @@ public class FileController {
     public ResponseEntity<Resource> serveFile(@PathVariable String fileName) {
         Resource file = fileService.loadFile(fileName);
         String mimeType;
+        String originalFileName = fileService.getOriginalFileName(fileName);
         try {
             mimeType = Files.probeContentType(Paths.get(file.getURI()));
+            if (mimeType == null) {
+                mimeType = "application/octet-stream";
+            }
         } catch (IOException e) {
             throw new RuntimeException("Could not determine file type.", e);
         }
@@ -37,10 +41,10 @@ public class FileController {
         HttpHeaders headers = new HttpHeaders();
         if (mimeType.equals("application/pdf") || mimeType.contains("image")) {
             // Display PDF, PNG, JPEG, and GIF files in the browser
-            headers.setContentDisposition(ContentDisposition.builder("inline").filename(fileName).build());
+            headers.setContentDisposition(ContentDisposition.builder("inline").filename(originalFileName).build());
         } else {
             // Download all other file types
-            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(originalFileName).build());
         }
 
         return ResponseEntity.ok().headers(headers).contentType(mediaType).body(file);
