@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onUpdated } from 'vue';
 import { useRoute, useRouter } from "vue-router";
 import Swal from 'sweetalert2';
 import Title from '../components/Title.vue';
@@ -21,10 +21,11 @@ const display = ref(false);
 const categoryId = ref(1);
 const isUpdatePage = ref(false);
 const userFiles = ref([])
-const filesName = ref([])
+const files = ref([])
 
 onMounted(async () => {
     categoryItem.value = await getAllCategories();
+    // console.log(await getDataAdminById(params?.id, false))
     if (params?.id) {
         isUpdatePage.value = true;
         announcement.value = await getDataAdminById(params?.id, false);
@@ -33,8 +34,8 @@ onMounted(async () => {
         closeDate.value = getFormattedDate(announcement.value.closeDate);
         closeTime.value = getFormattedTime(announcement.value.closeDate);
         categoryId.value = getCategoryId(announcement.value.announcementCategory);
-
         display.value = announcement.value.announcementDisplay === 'Y';
+        files.value = announcement.value.files.map((file) => file)
     } else {
         isUpdatePage.value = false;
         announcement.value = {
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (let i = 0; i < maxFiles; i++) {
                     if (e.target.files[i] !== userFiles.value[i]) {
                         userFiles.value.push(e.target.files[i])
-                        filesName.value.push(e.target.files[i].name)
+                        files.value.push(e.target.files[i].name)
                     }
                 }
                 toastMixin.fire({
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         if (e.target.files[i] !== userFiles.value[i]) {
                             userFiles.value.push(e.target.files[i])
-                            filesName.value.push(e.target.files[i].name)
+                            files.value.push(e.target.files[i].name)
                         }
                     }
                 }
@@ -172,6 +173,14 @@ const getCategoryId = (categoryName) => {
     return category.id
 }
 
+const prepareDelete = ref([])
+const confirmDelete = ref([])
+const deleteAttachFile = async (file) => {
+    prepareDelete.value.push(file)
+    files.value.splice(files.value.indexOf(file), 1)
+    console.log(prepareDelete.value)
+}
+
 const AddEditAnnouncement = async (editedAnnounce, id) => {
     const data = {
         announcementTitle: editedAnnounce.announcementTitle,
@@ -182,6 +191,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
         categoryId: categoryId.value
     }
 
+    // update announcement
     if (isUpdatePage.value === true) {
         const response = await fetch(import.meta.env.VITE_ROOT_API + `/api/announcements/${id}`, {
             method: 'PUT',
@@ -209,6 +219,16 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
                 confirmButtonColor: '#155e75',
             })
         }
+        confirmDelete.value = prepareDelete.value.map((file) => file.uniqueFileName)
+        confirmDelete.value.forEach(async (file) => {
+            await fetch(import.meta.env.VITE_ROOT_API + `/api/file/${file}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                }
+            })
+        })
+        // add new announcement
     } else {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements", {
             method: 'POST',
@@ -370,11 +390,19 @@ const toastMixin = Swal.mixin({
                                     class="border-2 p-2 rounded-lg border-dashed text-zinc-400 file:bg-emerald-plus file:hover:bg-emerald-light 
                             file:transition-colors file:text-white file:py-3 file:px-3 file:mr-6 file:rounded-lg file:border-0" />
                             </div>
-                            <div v-for="file in filesName" class="flex-col">
+                            <!-- attach file -->
+                            <div v-for="file in files" class="flex-col">
                                 <div class="flex my-3">
-                                    <div class="border-2 border-dashed rounded-lg p-3 w-96">{{ file }}</div>
-                                    <button
-                                        @click="filesName.splice(filesName.indexOf(file), 1), userFiles.splice(filesName.indexOf(file), 1)"
+                                    <div class="border-2 border-dashed rounded-lg p-3 w-96" v-if="!params.id">
+                                        {{ file }}
+                                    </div>
+                                    <div class="border-2 border-dashed rounded-lg p-3 w-96" v-else>
+                                        {{ file.originalFileName }}
+                                    </div>
+                                    <button v-if="params.id" @click="deleteAttachFile(file)" type="reset"
+                                        class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-5">clear</button>
+                                    <button v-else
+                                        @click="files.splice(files.indexOf(file), 1), userFiles.splice(files.indexOf(file), 1)"
                                         class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-5">clear</button>
                                 </div>
                             </div>
@@ -401,7 +429,6 @@ const toastMixin = Swal.mixin({
                                 :class="disableCloseTime ? 'cursor-not-allowed text-zinc-300' : ''">
                         </div>
                     </div>
-
                     <div class="flex mt-5">
                         <div class="w-44 text-cyan-800 font-bold pt-2">Display</div>
                         <label class="cursor-pointer label">
