@@ -11,7 +11,10 @@ import sit.int221.entities.File;
 import sit.int221.utils.AnnouncementDisplay;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -43,7 +46,12 @@ public class AnnouncementDTO {
     @JsonIgnore
     private List<File> files;
     @JsonProperty("files")
-    public List<String> getFiles() {
-        return files.stream().map(File::getOriginalFileName).toList();
+    public List<Map<String, String>> getFiles() {
+        return files.stream().map(file -> {
+            Map<String, String> fileMap = new HashMap<>();
+            fileMap.put("originalFileName", file.getOriginalFileName());
+            fileMap.put("uniqueFileName", file.getUniqueFileName());
+            return fileMap;
+        }).collect(Collectors.toList());
     }
 }

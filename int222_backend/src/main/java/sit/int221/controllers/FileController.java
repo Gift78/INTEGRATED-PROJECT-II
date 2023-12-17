@@ -8,16 +8,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sit.int221.entities.Announcement;
-import sit.int221.entities.File;
-import sit.int221.exceptions.AnnouncementNotFoundException;
-import sit.int221.repositories.AnnouncementRepository;
 import sit.int221.services.FileService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,12 +21,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FileController {
     private final FileService fileService;
-    private final AnnouncementRepository announcementRepository;
 
     @GetMapping("/{fileName:.+}")
     @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable String fileName, @RequestParam Integer announcementId) {
-        Resource file = fileService.loadFile(fileName, announcementId);
+    public ResponseEntity<Resource> serveFile(@PathVariable String fileName) {
+        Resource file = fileService.loadFile(fileName);
         String mimeType;
         try {
             mimeType = Files.probeContentType(Paths.get(file.getURI()));
@@ -60,14 +54,13 @@ public class FileController {
 
     @PutMapping("")
     public ResponseEntity<?> updateAnnouncementWithFiles(@RequestPart("announcementId") Integer announcementId, @RequestPart("files") MultipartFile[] files) {
-        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new AnnouncementNotFoundException(announcementId));
-        List<File> oldFiles = announcement.getFiles();
-        if (oldFiles != null) {
-            for (File oldFile : oldFiles) {
-                fileService.deleteFile(oldFile.getUniqueFileName());
-            }
-        }
         fileService.storeFiles(files, announcementId);
         return ResponseEntity.ok(Map.of("message", "You successfully uploaded " + files.length + " files and updated the announcement!"));
+    }
+
+    @DeleteMapping("/{uniqueFilename:.+}")
+    public ResponseEntity<?> deleteFile(@PathVariable String uniqueFilename) {
+        fileService.deleteFile(uniqueFilename);
+        return ResponseEntity.ok(Map.of("message", "You successfully deleted the file!"));
     }
 }

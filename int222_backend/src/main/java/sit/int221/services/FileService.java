@@ -67,15 +67,15 @@ public class FileService {
         try {
             Path filePath = Path.of(uploadDir).resolve(fileName).normalize();
             Files.delete(filePath);
+
+            File file = fileRepository.findByUniqueFileName(fileName);
+            fileRepository.delete(file);
         } catch (Exception ex) {
             throw new RuntimeException("File not found " + fileName, ex);
         }
     }
 
-    public Resource loadFile(String originalFileName, Integer announcementId) {
-        File file = fileRepository.findByAnnouncementIdAndOriginalFileName(announcementId, originalFileName);
-        String uniqueFileName = file.getUniqueFileName();
-
+    public Resource loadFile(String uniqueFileName) {
         try {
             Path filePath = Path.of(uploadDir).resolve(uniqueFileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
@@ -87,5 +87,10 @@ public class FileService {
         } catch (Exception ex) {
             throw new RuntimeException("File not found " + uniqueFileName, ex);
         }
+    }
+
+    public String getOriginalFileName(String uniqueFileName) {
+        File file = fileRepository.findByUniqueFileName(uniqueFileName);
+        return file.getOriginalFileName();
     }
 }
