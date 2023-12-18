@@ -2,11 +2,11 @@ package sit.int221.services;
 
 import java.time.LocalDateTime;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sit.int221.entities.OtpInfo;
 import sit.int221.exceptions.InvalidOTPException;
@@ -64,13 +64,11 @@ public class OtpService {
         return otp;
     }
 
-    public CompletableFuture<Boolean> sendOtp(String email, String otp) {
+    @Async
+    public void sendOtp(String email, String otp) {
         String subject = "OTP Verification";
         String text = emailService.getOtpTemplate(otp);
-        CompletableFuture<Void> emailSendingFuture = emailService.sendEmail(email, subject, text);
-
-        return emailSendingFuture.thenApplyAsync(result -> true)
-                .exceptionally(ex -> false);
+        emailService.sendEmail(email, subject, text);
     }
 
     private int getOtpAttempts(String email) {

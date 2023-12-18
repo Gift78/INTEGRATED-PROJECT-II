@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +52,6 @@ public class SubscriptionService {
         }
     }
 
-    @Async
     public void sendOtpSubscribeResponseEmail(String email, List<Integer> categoryIds) {
         for (Integer categoryId : categoryIds) {
             Category category = categoryService.getCategory(categoryId);
@@ -63,25 +61,20 @@ public class SubscriptionService {
         }
     }
 
+    @Async
     public void sendAnnouncementEmail(Integer categoryId, Announcement announcement) {
         List<Subscription> subscriptions = subscriptionRepository.findByCategoryId(categoryId);
 
         if (announcement.getAnnouncementDisplay().equals(AnnouncementDisplay.Y)) {
             if (announcement.getPublishDate() == null) {
-                CompletableFuture.runAsync(() -> {
-                    subscriptions.forEach(subscription -> emailService.sendSubscriberEmail(subscription.getEmail(), announcement));
-                });
+                subscriptions.forEach(subscription -> emailService.sendSubscriberEmail(subscription.getEmail(), announcement));
             } else {
                 long delay = Duration.between(ZonedDateTime.now(ZoneId.systemDefault()), announcement.getPublishDate()).toMillis();
                 Executors.newSingleThreadScheduledExecutor().schedule(() -> {
                     subscriptions.forEach(subscription -> emailService.sendSubscriberEmail(subscription.getEmail(), announcement));
                 }, delay, TimeUnit.MILLISECONDS);
-                CompletableFuture.completedFuture(null);
             }
-            return;
         }
-
-        CompletableFuture.completedFuture(null);
     }
 
     @Transactional

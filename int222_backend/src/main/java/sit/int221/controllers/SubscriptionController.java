@@ -11,8 +11,6 @@ import sit.int221.services.OtpService;
 import sit.int221.services.SubscriptionService;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/subscription")
@@ -26,16 +24,9 @@ public class SubscriptionController {
     public ResponseEntity<?> generateOtp(@RequestBody OtpRequestDTO otpRequest) {
         try {
             String otp = otpService.generateOtp(otpRequest.getEmail());
-            CompletableFuture<Boolean> emailSendingFuture = otpService.sendOtp(otpRequest.getEmail(), otp);
-            boolean isEmailSent = emailSendingFuture.get();
+            otpService.sendOtp(otpRequest.getEmail(), otp);
 
-            if (isEmailSent) {
-                return ResponseEntity.ok(Map.of("message", "OTP sent successfully"));
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to send OTP"));
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to send OTP"));
+            return ResponseEntity.ok(Map.of("message", "OTP sent successfully"));
         } catch (OtpRetryLimitExceededException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "OTP generation limit exceeded. Please try again after some time."));
         }
@@ -47,9 +38,7 @@ public class SubscriptionController {
 
         if (isOtpValid) {
             subscriptionService.subscribe(otpRequest.getEmail(), otpRequest.getCategoryIds());
-
-            CompletableFuture.runAsync(() ->
-                    subscriptionService.sendOtpSubscribeResponseEmail(otpRequest.getEmail(), otpRequest.getCategoryIds()));
+            subscriptionService.sendOtpSubscribeResponseEmail(otpRequest.getEmail(), otpRequest.getCategoryIds());
             return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid OTP"));

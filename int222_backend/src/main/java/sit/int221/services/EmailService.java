@@ -13,7 +13,6 @@ import sit.int221.repositories.UnsubscribeTokenRepository;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -24,16 +23,15 @@ public class EmailService {
     private final UnsubscribeTokenRepository unsubscribeTokenRepository;
 
     @Async
-    public CompletableFuture<Void> sendEmail(String to, String subject, String text) {
+    public void sendEmail(String to, String subject, String text) {
         try {
             MimeMessageHelper message = new MimeMessageHelper(javaMailSender.createMimeMessage(), true, "UTF-8");
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text, true);
             javaMailSender.send(message.getMimeMessage());
-            return CompletableFuture.completedFuture(null);
         } catch (MessagingException e) {
-            return CompletableFuture.failedFuture(e);
+            throw new RuntimeException(e);
         }
     }
 
