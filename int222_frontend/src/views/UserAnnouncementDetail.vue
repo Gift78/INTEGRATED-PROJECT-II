@@ -9,6 +9,7 @@ import { formatDatetimeLocal } from '../composable/formatDatetime';
 import { storeToRefs } from 'pinia'
 import { getDataUserById } from '../composable/getData';
 import Swal from 'sweetalert2'
+import FileBarComponent from '../components/FileBarComponent.vue';
 
 const router = useRouter();
 const params = useRoute().params;
@@ -18,7 +19,6 @@ const { mode } = storeToRefs(modeStore);
 
 onMounted(async () => {
     data.value = await getDataUserById(params?.id, true)
-    
     if (data.value === undefined || data.value === null) {
         Swal.fire({
             icon: 'error',
@@ -26,10 +26,11 @@ onMounted(async () => {
             text: 'Sorry, the request page is not available',
             confirmButtonColor: '#155e75',
         }).then(() => {
-            router.push({name: 'UserAnnouncement'})
+            router.push({ name: 'UserAnnouncement' })
         })
     }
 })
+
 </script>
 
 <template>
@@ -63,12 +64,20 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
-
-            <div class="ql-editor" v-html="data?.announcementDescription"></div>
+            <!-- description -->
+            <div class="ql-editor mx-12" v-html="data?.announcementDescription"></div>
+            <!-- file -->
+            <div class="text-cyan-800 mx-12 mt-10" v-if="data.files?.length !== 0">
+                <div v-for="file in data?.files" class="flex-col">
+                    <FileBarComponent :file="file" />
+                </div>
+            </div>
         </div>
 
         <div v-if="data" class="flex justify-end mt-4">
-            <button class="ann-button bg-cyan-800 hover:bg-cyan-600 text-white rounded-lg py-2 px-6 transition-colors duration-200" @click="router.push({name: 'UserAnnouncement'})">
+            <button
+                class="ann-button bg-cyan-800 hover:bg-cyan-600 text-white rounded-lg py-2 px-6 transition-colors duration-200"
+                @click="router.push({ name: 'UserAnnouncement' })">
                 Back
             </button>
         </div>

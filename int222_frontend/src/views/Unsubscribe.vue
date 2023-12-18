@@ -7,6 +7,7 @@ import { getAllCategories } from '../composable/getData.js'
 
 const { query } = useRoute();
 const categoryName = ref('')
+
 onMounted(async () => {
     const category = await getAllCategories()
     categoryName.value = category.find((cat) => {
@@ -14,32 +15,13 @@ onMounted(async () => {
     }).categoryName
 })
 
-const token = ref('')
-const generateUnsubToken = async () => {
-    console.log(query)
-    const response = await fetch(import.meta.env.VITE_ROOT_API + `/api/subscription/unsubscribe/generate-token?email=${query?.email}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    if (response.ok) {
-        const res = await response.json()
-        token.value = res.token
-        unsubscribe()
-    } else {
-        const errorData = await response.json()
-        console.log(errorData)
-    }
-}
-
 const unsubscribe = async () => {
     const response = await fetch(import.meta.env.VITE_ROOT_API + `/api/subscription/unsubscribe`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ token: token.value, categoryId: Number(query?.categoryId) })
+        body: JSON.stringify({ token: query?.token, categoryId: Number(query?.categoryId) })
     })
     if (response.ok) {
         Swal.fire({
@@ -56,7 +38,7 @@ const unsubscribe = async () => {
     }
 }
 
-const cancelButton = ()=>{
+const cancelButton = () => {
     Swal.fire({
         title: 'Are you sure?',
         text: "You will be redirected to the home page",
@@ -65,17 +47,17 @@ const cancelButton = ()=>{
         confirmButtonColor: '#155e75',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, cancel!'
-      }).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
-          Swal.fire(
-            'Cancelled!',
-            'You have been redirected to the home page',
-            'success'
-          ).then(()=>{
-              window.location.href = '/'
-          })
+            Swal.fire(
+                'Cancelled!',
+                'You have been redirected to the home page',
+                'success'
+            ).then(() => {
+                window.location.href = '/'
+            })
         }
-      })
+    })
 }
 </script>
  
@@ -83,7 +65,7 @@ const cancelButton = ()=>{
     <div class="w-full flex justify-center">
         <div class="mt-56">
             <div class="text-4xl text-center">
-                Unsubscribe from {{ categoryName}}
+                Unsubscribe from {{ categoryName }}
             </div>
             <div class="text-xl text-center mt-5">
                 are you sure you wish to unsubscribe from this category?
@@ -94,7 +76,7 @@ const cancelButton = ()=>{
             <div class="flex justify-center mt-5">
                 <button @click="cancelButton"
                     class="px-16 py-2 rounded-lg bg-emerald-plus text-white mx-2 hover:bg-emerald-light transition-colors duration-200">No</button>
-                <button @click="generateUnsubToken"
+                <button @click="unsubscribe()"
                     class="px-16 py-2 rounded-lg bg-zinc-400 text-white mx-2 hover:bg-zinc-500 transition-colors duration-200">Yes</button>
             </div>
         </div>

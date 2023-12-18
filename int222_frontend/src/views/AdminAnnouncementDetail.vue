@@ -9,6 +9,7 @@ import NavbarComponent from '../components/NavbarComponent.vue'
 import ViewCounter from '../components/icons/ViewCounter.vue';
 import { getDataAdminById } from '../composable/getData';
 import Swal from 'sweetalert2';
+import FileBarComponent from '../components/FileBarComponent.vue';
 
 const { params } = useRoute();
 const router = useRouter();
@@ -62,7 +63,8 @@ onMounted(async () => {
                 </div>
                 <div class="flex mt-5">
                     <div class="w-52 text-cyan-800 font-bold">Description</div>
-                    <div class="w-full" v-html="data?.announcementDescription"></div>
+                    <div class="ql-editor w-full border rounded-lg" v-html="data?.announcementDescription"></div>
+
                 </div>
                 <div class="flex mt-5">
                     <div class="w-52 text-cyan-800 font-bold">Publish Date</div>
@@ -76,6 +78,14 @@ onMounted(async () => {
                 <div class="flex mt-5">
                     <div class="w-52 text-cyan-800 font-bold">Display</div>
                     <div class="ann-display text-cyan-800 w-full">{{ data?.announcementDisplay }}</div>
+                </div>
+                <div class="flex mt-5" v-if="data.files?.length !== 0">
+                    <div class="w-52 text-cyan-800 font-bold">File Uploaded</div>
+                    <div class="flex-col w-full">
+                        <div v-for="file in data.files">
+                            <FileBarComponent :file="file" />
+                        </div>
+                    </div>
                 </div>
             </div>
 

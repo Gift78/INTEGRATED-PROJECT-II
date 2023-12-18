@@ -31,4 +31,13 @@ spring:
             "mail.transport.protocol": smtp
             "mail.smtp.auth": true
             "mail.smtp.starttls.enable": true
-
+    servlet:
+        multipart:
+            max-file-size: 20MB
+            max-request-size: 80MB
+            enabled: true
+    security:
+        oauth2:
+            client:
+file:
+    upload-dir: /public/SAS/uploads
