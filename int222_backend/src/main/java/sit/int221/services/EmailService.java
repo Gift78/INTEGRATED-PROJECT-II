@@ -7,7 +7,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sit.int221.entities.Announcement;
+import sit.int221.entities.UnsubscribeToken;
+import sit.int221.repositories.UnsubscribeTokenRepository;
 
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -16,6 +21,7 @@ public class EmailService {
     private static final String BASE_URL = "https://intproj22.sit.kmutt.ac.th/kw2";
 
     private final JavaMailSender javaMailSender;
+    private final UnsubscribeTokenRepository unsubscribeTokenRepository;
 
     @Async
     public CompletableFuture<Void> sendEmail(String to, String subject, String text) {
@@ -37,10 +43,32 @@ public class EmailService {
     }
 
     public String getAnnouncementTemplate(String email, String announcementDescription, Integer announcementId, Integer categoryId) {
+        String token = generateUnsubscribeToken(email);
         return announcementDescription + "<br><br>" +
                 "<a href=\"" + BASE_URL + "/announcement/" + announcementId + "\">Announcement Link</a>" +
                 "<br>" +
-                "<a href=\"" + BASE_URL + "/unsubscribe?email=" + email + "&categoryId=" + categoryId + "\">Unsubscribe Link</a>";
+                "<a href=\"" + BASE_URL + "/unsubscribe?token=" + token + "&categoryId=" + categoryId + "\">Unsubscribe Link</a>";
+    }
+
+    public String generateUnsubscribeToken(String email) {
+        UnsubscribeToken existingToken = unsubscribeTokenRepository.findByEmail(email);
+        if (existingToken != null) {
+            unsubscribeTokenRepository.delete(existingToken);
+        }
+
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[24];
+        secureRandom.nextBytes(randomBytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+
+        UnsubscribeToken unsubscribeToken = new UnsubscribeToken();
+        unsubscribeToken.setEmail(email);
+        unsubscribeToken.setToken(token);
+        unsubscribeToken.setGeneratedAt(LocalDateTime.now());
+
+        unsubscribeTokenRepository.save(unsubscribeToken);
+
+        return token;
     }
 
     public String getOtpTemplate(String otp) {
