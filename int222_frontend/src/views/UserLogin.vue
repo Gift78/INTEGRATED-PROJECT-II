@@ -41,8 +41,8 @@ const login = async () => {
 </script>
 <template>
     <div class="w-full h-screen bg-slate-100 items-center text-cyan-800">
-        <div class="flex flex-row w-full h-full">
-            <div class="mx-auto my-56 py-7 px-7 w-128 flex flex-col bg-white rounded-2xl shadow-2xl ">
+        <div class="flex flex-col justify-center w-full h-full">
+            <div class="mx-auto py-7 px-7 w-1/3 h-1/2 flex flex-col justify-center bg-white rounded-2xl shadow-2xl ">
                 <div class="text-3xl mb-5">SAS Login</div>
                 <!-- login status -->
                 <div v-if="displayMsg === 'Login Successful'"
@@ -54,12 +54,13 @@ const login = async () => {
                 </div>
 
                 <div class="text-lg mt-5 text-cyan-800">Username</div>
-                <input type="text" @keyup.enter="login" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
-                    v-model.trim="username" maxlength="45">
+                <input type="text" @keyup.enter="login"
+                    class="ann-username border rounded-lg mt-1 pl-3 w-full h-12 bg-white" v-model.trim="username"
+                    maxlength="45">
                 <span class="px-4 flex flex-col items-end">({{ username.length }}/45)</span>
                 <div class="text-lg text-cyan-800 ">Password</div>
                 <input type="password" v-model="password" @keyup.enter="login"
-                    class="ann-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white">
+                    class="ann-password border rounded-lg mt-1 pl-3 w-full h-12 bg-white">
 
                 <div class="flex mt-10">
                     <button @click="login"
@@ -68,8 +69,6 @@ const login = async () => {
                     </button>
                 </div>
             </div>
-
-
         </div>
 
     </div>

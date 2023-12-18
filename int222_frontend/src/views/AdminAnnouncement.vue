@@ -108,7 +108,7 @@ const showDeleteModal = (id) => {
             <div v-else>
                 <!-- show data -->
                 <div v-for="(announcement, index) in data" :key="data.id" :class="getRole()==='admin'?'grid grid-cols-14 my-5' : 'grid grid-cols-12 my-5'"
-                    class="ann-item bg-white h-20 rounded-xl shadow-md">
+                    class="ann-item bg-white h-20 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all hover:bg-slate-100">
                     <div class="text-cyan-800 my-auto text-center">{{ index + 1 }} </div>
                     <div class="ann-title text-cyan-800 my-auto col-span-2 overflow-hidden">{{
                         announcement.announcementTitle }}

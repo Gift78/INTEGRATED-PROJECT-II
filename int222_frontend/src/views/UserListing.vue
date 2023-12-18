@@ -108,7 +108,8 @@ const showDeleteModal = (adminId, id) => {
             <!-- body table -->
             <div v-if="users === undefined || users.length === 0"
                 class="text-center items-center justify-center text-gray-400 mt-48 text-2xl">No Users</div>
-            <div v-else class="ann-item grid grid-cols-14 my-5 bg-white h-20 rounded-xl shadow-md"
+            <div v-else
+                class="ann-item grid grid-cols-14 my-5 bg-white h-20 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all hover:bg-slate-100"
                 v-for="(user, index) in users" :key="user.id">
                 <div class="my-auto text-center">{{ index + 1 }}</div>
                 <div class="ann-username my-auto col-span-2 overflow-hidden mr-4">{{ user.username }}</div>

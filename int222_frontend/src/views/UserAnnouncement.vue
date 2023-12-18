@@ -342,8 +342,8 @@ const verifyOTP = async () => {
                 v-if="data === undefined || data.length === 0 || data.content.length === 0">No Announcement
             </div>
             <div v-else>
-                <div v-for="(announcement, index) in data.content" :key="data.id"
-                    class="ann-item grid grid-cols-9 bg-white hover:bg-slate-100 transition-colors duration-200 my-5 py-7 h-20 rounded-xl shadow-md cursor-pointer"
+                <div v-for="(announcement, index) in data.content" :key="data.id" class="ann-item grid grid-cols-9 bg-white hover:bg-slate-100
+                        transition-all duration-200 my-5 py-7 h-20 rounded-xl shadow-md cursor-pointer hover:shadow-lg hover:scale-105"
                     @click="router.push({ name: 'UserAnnouncementDetail', params: { id: announcement.id } })">
                     <div class="text-center"> {{ index + 1 + (currentPage * 5) }}</div>
                     <div class="ann-title underline overflow-hidden"

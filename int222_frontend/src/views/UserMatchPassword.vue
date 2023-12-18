@@ -42,7 +42,7 @@ const matchPassword = async () => {
                 </div>
                 <div class="w-1/6 ">
                 </div>
-                <div class="w-3/5 my-32 py-12 px-32 mx-32 flex flex-col bg-white rounded-2xl shadow-2xl ">
+                <div class="w-3/5 h-3/4 my-auto py-12 px-32 mx-32 flex flex-col bg-white rounded-2xl shadow-2xl ">
                     <div class="text-4xl mt-5">Match Password</div>
                     <div v-if="matchMsg !== ''">
                         <div v-if="matchMsg === 'Password Matched'"
