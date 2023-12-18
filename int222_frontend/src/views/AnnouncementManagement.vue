@@ -226,7 +226,7 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
                 }
             })
         })
-        if(userFiles.value.length > 0){
+        if (userFiles.value.length > 0) {
             const response_update = await response.json()
             const form = document.getElementById('form');
             const formData = new FormData(form);
@@ -285,32 +285,35 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
                 confirmButtonColor: '#155e75',
             })
         }
-        const form = document.getElementById('form');
-        const formData = new FormData(form);
-        for (let i = 0; i < userFiles.value.length; i++) {
-            let blob = new Blob([userFiles.value[i]], { type: 'application/octet-stream' });
-            formData.append('files', blob, userFiles.value[i].name);
-        }
-        let blob = new Blob([response_post.id], { type: 'application/json' });
-        formData.append('announcementId', blob, 'announcementId');
+        if (userFiles.value.length > 0) {
+            console.log("add file?")
+            const form = document.getElementById('form');
+            const formData = new FormData(form);
+            for (let i = 0; i < userFiles.value.length; i++) {
+                let blob = new Blob([userFiles.value[i]], { type: 'application/octet-stream' });
+                formData.append('files', blob, userFiles.value[i].name);
+            }
+            let blob = new Blob([response_post.id], { type: 'application/json' });
+            formData.append('announcementId', blob, 'announcementId');
 
-        const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: formData
-        })
-        if (responseUploadFile.ok) {
-            console.log('upload file success')
-        } else {
-            const errorData = await responseUploadFile.json();
-            Swal.fire({
-                icon: 'error',
-                title: 'Error ' + errorData.status,
-                text: errorData.message,
-                confirmButtonColor: '#155e75',
+            const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: formData
             })
+            if (responseUploadFile.ok) {
+                console.log('upload file success')
+            } else {
+                const errorData = await responseUploadFile.json();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error ' + errorData.status,
+                    text: errorData.message,
+                    confirmButtonColor: '#155e75',
+                })
+            }
         }
     }
 }
