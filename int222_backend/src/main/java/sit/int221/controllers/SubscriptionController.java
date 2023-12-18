@@ -60,18 +60,11 @@ public class SubscriptionController {
     public ResponseEntity<?> unsubscribe(@RequestBody Map<String, Object> request) {
         String token = (String) request.get("token");
         Integer categoryId = (Integer) request.get("categoryId");
-        String email = subscriptionService.verifyUnsubscribeToken(token);
-        if (email != null) {
-            subscriptionService.unsubscribe(email, categoryId);
+        if (token != null) {
+            subscriptionService.unsubscribe(token, categoryId);
             return ResponseEntity.ok(Map.of("message", "Unsubscribed successfully"));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid or expired token"));
         }
-    }
-
-    @PostMapping("/unsubscribe/generate-token")
-    public ResponseEntity<?> generateUnsubscribeToken(@RequestParam String email) {
-        String token = subscriptionService.generateUnsubscribeToken(email);
-        return ResponseEntity.ok(Map.of("token", token));
     }
 }
