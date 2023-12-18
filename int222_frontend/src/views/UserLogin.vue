@@ -43,7 +43,7 @@ const login = async () => {
     <div class="w-full h-screen bg-slate-100 items-center text-cyan-800">
         <div class="flex flex-row w-full h-full">
             <div class="mx-auto my-56 py-7 px-7 w-128 flex flex-col bg-white rounded-2xl shadow-2xl ">
-                <div class="text-4xl mb-5">SAS Login</div>
+                <div class="text-3xl mb-5">SAS Login</div>
                 <!-- login status -->
                 <div v-if="displayMsg === 'Login Successful'"
                     class="px-5 py-4 rounded-xl mt-5 border border-emerald-500 bg-emerald-50 text-emerald-500">
