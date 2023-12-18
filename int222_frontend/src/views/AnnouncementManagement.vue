@@ -25,7 +25,6 @@ const files = ref([])
 
 onMounted(async () => {
     categoryItem.value = await getAllCategories();
-    // console.log(await getDataAdminById(params?.id, false))
     if (params?.id) {
         isUpdatePage.value = true;
         announcement.value = await getDataAdminById(params?.id, false);
@@ -58,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (let i = 0; i < maxFiles; i++) {
                     if (e.target.files[i] !== userFiles.value[i]) {
                         userFiles.value.push(e.target.files[i])
-                        files.value.push(e.target.files[i].name)
+                        files.value.push(e.target.files[i])
                     }
                 }
                 toastMixin.fire({
@@ -75,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         if (e.target.files[i] !== userFiles.value[i]) {
                             userFiles.value.push(e.target.files[i])
-                            files.value.push(e.target.files[i].name)
+                            files.value.push(e.target.files[i])
                         }
                     }
                 }
@@ -178,7 +177,6 @@ const confirmDelete = ref([])
 const deleteAttachFile = async (file) => {
     prepareDelete.value.push(file)
     files.value.splice(files.value.indexOf(file), 1)
-    console.log(prepareDelete.value)
 }
 
 const AddEditAnnouncement = async (editedAnnounce, id) => {
@@ -228,6 +226,35 @@ const AddEditAnnouncement = async (editedAnnounce, id) => {
                 }
             })
         })
+        if(userFiles.value.length > 0){
+            const response_update = await response.json()
+            const form = document.getElementById('form');
+            const formData = new FormData(form);
+            for (let i = 0; i < userFiles.value.length; i++) {
+                let blob = new Blob([userFiles.value[i]], { type: 'application/octet-stream' });
+                formData.append('files', blob, userFiles.value[i].name);
+            }
+            let blob = new Blob([response_update.id], { type: 'application/json' });
+            formData.append('announcementId', blob, 'announcementId');
+            const responseUploadFile = await fetch(import.meta.env.VITE_ROOT_API + `/api/file`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: formData
+            })
+            if (responseUploadFile.ok) {
+                console.log('upload file success')
+            } else {
+                const errorData = await responseUploadFile.json();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error ' + errorData.status,
+                    text: errorData.message,
+                    confirmButtonColor: '#155e75',
+                })
+            }
+        }
         // add new announcement
     } else {
         const response = await fetch(import.meta.env.VITE_ROOT_API + "/api/announcements", {
@@ -300,7 +327,7 @@ const showBackButtonConfirmation = () => {
             cancelButtonText: 'No, keep it'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.push({ name: 'AdminAnnouncement' })
+                router.push({ path: `/admin/announcement/${params.id}` })
             }
         })
     } else {
@@ -377,7 +404,6 @@ const toastMixin = Swal.mixin({
                         </div>
                         <div>
                             <div class="flex-col">
-
                                 <label for="file"
                                     class="flex hover:cursor-pointer border-2 py-1 px-1 rounded-lg border-dashed ">
                                     <div
@@ -393,13 +419,14 @@ const toastMixin = Swal.mixin({
                             <!-- attach file -->
                             <div v-for="file in files" class="flex-col">
                                 <div class="flex my-3">
-                                    <div class="border-2 border-dashed rounded-lg p-3 w-96" v-if="!params.id">
-                                        {{ file }}
+                                    <div class="border-2 border-dashed rounded-lg p-3 w-96" v-if="isUpdatePage">
+                                        {{ file.originalFileName }}
+                                        {{ file.name }}
                                     </div>
                                     <div class="border-2 border-dashed rounded-lg p-3 w-96" v-else>
-                                        {{ file.originalFileName }}
+                                        {{ file.name }}
                                     </div>
-                                    <button v-if="params.id" @click="deleteAttachFile(file)" type="reset"
+                                    <button v-if="isUpdatePage" @click="deleteAttachFile(file)" type="reset"
                                         class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-5">clear</button>
                                     <button v-else
                                         @click="files.splice(files.indexOf(file), 1), userFiles.splice(files.indexOf(file), 1)"

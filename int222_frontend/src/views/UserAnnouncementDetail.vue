@@ -19,8 +19,6 @@ const { mode } = storeToRefs(modeStore);
 
 onMounted(async () => {
     data.value = await getDataUserById(params?.id, true)
-    console.log(data.value)
-
     if (data.value === undefined || data.value === null) {
         Swal.fire({
             icon: 'error',
