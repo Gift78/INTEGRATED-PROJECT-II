@@ -25,7 +25,7 @@ const categoryItem = ref([])
 const selectedCategory = ref('')
 const currentPage = ref(0)
 const auth = useAuth()
-const { isRefreshTokenExpired } = auth
+const { isRefreshTokenExpired, getEmail } = auth
 const buttonText = ref('Login')
 
 onMounted(async () => {
@@ -42,6 +42,9 @@ onMounted(async () => {
         buttonText.value = 'Announcement List'
     } else {
         buttonText.value = 'Login'
+    }
+    if (getEmail) {
+        email.value = getEmail()
     }
 })
 
@@ -228,7 +231,7 @@ const verifyOTP = async () => {
                 </button>
             </div>
 
-            <!-- modal -->
+            <!-- modal subscribe -->
             <div v-if="openSubModal" class="fixed inset-0 flex items-center justify-center backdrop-brightness-75">
                 <div class="bg-white w-128 h-100 p-4 rounded-3xl shadow-2xl">
                     <!-- first modal -->
@@ -259,7 +262,12 @@ const verifyOTP = async () => {
                             </div>
                         </div>
 
-                        <div class="flex justify-center mt-2">
+                        <div class="flex justify-center mt-2" v-if="email">
+                            <div class="font-semibold text-cyan-800 my-auto">Email : </div>
+                            <input type="text" placeholder="Your email address." v-model.trim="email" maxlength="150"
+                                class="border border-emerald-plus rounded-lg p-3 w-2/3 ml-5" @keydown.enter="subscribe()" />
+                        </div>
+                        <div class="flex justify-center mt-2" v-else>
                             <div class="font-semibold text-cyan-800 my-auto">Email : </div>
                             <input type="text" placeholder="Your email address." v-model.trim="email" maxlength="150"
                                 class="border border-emerald-plus rounded-lg p-3 w-2/3 ml-5" @keydown.enter="subscribe()" />
@@ -305,7 +313,8 @@ const verifyOTP = async () => {
                         </div>
                         <div class="flex justify-center mt-5">
                             <div class="text-cyan-800 font-semibold my-auto mx-3">OTP : </div>
-                            <input type="text" placeholder="OTP" maxlength="6" class="border p-2 rounded-lg" v-model="otp" @keydown.enter="verifyOTP()">
+                            <input type="text" placeholder="OTP" maxlength="6" class="border p-2 rounded-lg" v-model="otp"
+                                @keydown.enter="verifyOTP()">
                         </div>
                         <div class="flex justify-center">
                             <div v-if="isInvalidOTP" class="flex justify-center text-red-500">Invalid OTP provided</div>
