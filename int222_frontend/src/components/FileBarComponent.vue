@@ -7,6 +7,7 @@ import PDFIcon2 from './icons/PDFIcon2.vue';
 import ZipIcon from './icons/ZipIcon.vue';
 import DocxIcon from './icons/DocxIcon.vue';
 import { defineProps } from 'vue'
+import OpenFile from './icons/OpenFile.vue';
 const props = defineProps({
     file: {
         type: Object,
@@ -19,7 +20,7 @@ const downloadFile = async (unqFileName) => {
         window.open(FileUrl, '_blank')
     }
 }
-const CheckFileExtension = (originalName) => {
+const getType = (originalName) => {
     const ext = originalName.split('.').pop()
     return ext
 }
@@ -29,19 +30,21 @@ const CheckFileExtension = (originalName) => {
         <button @click="downloadFile(file?.uniqueFileName)"
             class="flex justify-between rounded-lg bg-zinc-100 mb-2 hover:bg-zinc-200 transition-colors">
             <div class="my-auto mx-3">
-                <ZipIcon
-                    v-if="CheckFileExtension(file?.originalFileName) === 'zip' || CheckFileExtension(file?.originalFileName) === 'rar'" />
-                <GifIcon v-else-if="CheckFileExtension(file?.originalFileName) === 'Gif'" />
-                <PDFIcon2 v-else-if="CheckFileExtension(file?.originalFileName) === 'pdf'" />
+                <ZipIcon v-if="getType(file?.originalFileName) === 'zip' || getType(file?.originalFileName) === 'rar'" />
+                <GifIcon v-else-if="getType(file?.originalFileName) === 'Gif'" />
+                <PDFIcon2 v-else-if="getType(file?.originalFileName) === 'pdf'" />
                 <DocxIcon
-                    v-else-if="CheckFileExtension(file?.originalFileName) === 'docx' || CheckFileExtension(file?.originalFileName) === 'doc'" />
-                <ImageIcon v-else-if="CheckFileExtension(file?.originalFileName) === 'png' || CheckFileExtension(file?.originalFileName) === 'jpg'
-                    || CheckFileExtension(file?.originalFileName) === 'jpeg'" />
+                    v-else-if="getType(file?.originalFileName) === 'docx' || getType(file?.originalFileName) === 'doc'" />
+                <ImageIcon v-else-if="getType(file?.originalFileName) === 'png' || getType(file?.originalFileName) === 'jpg'
+                    || getType(file?.originalFileName) === 'jpeg'" />
                 <FileIcon v-else />
             </div>
             <div class=" py-2">{{ file?.originalFileName }}
             </div>
-            <DownloadIcon class="my-auto mx-3" />
+            <DownloadIcon class="my-auto mx-3"
+                v-if="!['png', 'jpg', 'jpeg', 'pdf'].includes(getType(file.originalFileName))" />
+            <OpenFile class="my-auto mx-3" v-else />
+
         </button>
     </div>
 </template>
