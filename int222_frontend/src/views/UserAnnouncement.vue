@@ -39,7 +39,7 @@ onMounted(async () => {
     categoryItem.value = await getAllCategories()
     data.value = await getDataByPage(mode.value, currentPage.value, 5);
     if (localStorage.getItem("token") !== null && !isRefreshTokenExpired()) {
-        buttonText.value = 'Announcement List'
+        buttonText.value = 'Admin Page'
     } else {
         buttonText.value = 'Login'
     }
