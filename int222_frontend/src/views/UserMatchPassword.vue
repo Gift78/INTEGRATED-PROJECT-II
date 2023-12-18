@@ -60,11 +60,11 @@ const matchPassword = async () => {
                     </div>
                     <div class="text-lg mt-10 text-cyan-800">Username</div>
                     <input type="text" class="ann-username border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
-                        v-model.trim="username" maxlength="45">
+                        v-model.trim="username" maxlength="45" @keydown.enter="matchPassword">
                     <span class="px-4 flex flex-col items-end">({{ username.length }}/45)</span>
                     <div class="text-lg mt-10 text-cyan-800" minlength="8" maxlength="14">Password</div>
                     <input type="password" class="ann-password border rounded-lg mt-3 pl-3 w-full h-12 bg-white"
-                        v-model="password">
+                        v-model="password" @keydown.enter="matchPassword">
                     <div class="flex mt-20">
                         <button
                             class="ann-button text-white bg-cyan-800 hover:bg-cyan-700 border-0 shadow-lg transition-colors duration-200 w-28 h-12 rounded-lg"
