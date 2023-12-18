@@ -47,42 +47,35 @@ onMounted(async () => {
     }
 });
 
-
-document.addEventListener('DOMContentLoaded', function () {
-    const file = document.getElementById('file');
-    if (file) {
-        file.addEventListener('change', (e) => {
-            if (userFiles.value.length + e.target.files.length > 5) {
-                const maxFiles = 5 - userFiles.value.length;
-                for (let i = 0; i < maxFiles; i++) {
-                    if (e.target.files[i] !== userFiles.value[i]) {
-                        userFiles.value.push(e.target.files[i])
-                        files.value.push(e.target.files[i])
-                    }
-                }
-                toastMixin.fire({
-                    title: 'Error',
-                    text: 'The announcement can have at most 5 attachments',
-                });
-            } else {
-                for (let i = 0; i < e.target.files.length; i++) {
-                    if (e.target.files[i].size > 20000000) {
-                        toastMixin.fire({
-                            title: 'Error',
-                            text: 'The files size cannot be larger than 20 MB',
-                        });
-                    } else {
-                        if (e.target.files[i] !== userFiles.value[i]) {
-                            userFiles.value.push(e.target.files[i])
-                            files.value.push(e.target.files[i])
-                        }
-                    }
-                }
-            }
-        })
+const appendFile = (e) => {
+  if (userFiles.value.length + e.target.files.length > 5) {
+    const maxFiles = 5 - userFiles.value.length;
+    for (let i = 0; i < maxFiles; i++) {
+      if (e.target.files[i] !== userFiles.value[i]) {
+        userFiles.value.push(e.target.files[i]);
+        files.value.push(e.target.files[i]);
+      }
     }
-});
-
+    toastMixin.fire({
+      title: "Error",
+      text: "The announcement can have at most 5 attachments",
+    });
+  } else {
+    for (let i = 0; i < e.target.files.length; i++) {
+      if (e.target.files[i].size > 20000000) {
+        toastMixin.fire({
+          title: "Error",
+          text: "The files size cannot be larger than 20 MB",
+        });
+      } else {
+        if (e.target.files[i] !== userFiles.value[i]) {
+          userFiles.value.push(e.target.files[i]);
+          files.value.push(e.target.files[i]);
+        }
+      }
+    }
+  }
+};
 
 const validateTitle = computed(() => {
     return announcement.value.announcementTitle?.length > 0 && announcement.value.announcementTitle?.length <= 200
@@ -131,7 +124,7 @@ const validateDate = () => {
     return true;
 }
 
-const setDefualtValueCloseTimeAndPublishTime = () => {
+const setDefaultValueCloseTimeAndPublishTime = () => {
     if (closeDate.value?.length === 0 || closeDate.value === '') {
         closeTime.value = '';
     } else {
@@ -409,13 +402,13 @@ const toastMixin = Swal.mixin({
                             <div class="flex-col">
                                 <label for="file"
                                     class="flex hover:cursor-pointer border-2 py-1 px-1 rounded-lg border-dashed ">
-                                    <div
-                                        class="bg-emerald-plus hover:bg-emerald-light hover:transition-colors text-white py-2 px-4 rounded-md">
+                                    <div class="text-white py-2 px-4 rounded-md"
+                                        :class="files.length >= 5 ? 'cursor-not-allowed bg-zinc-200': 'bg-emerald-plus hover:bg-emerald-light hover:transition-colors'">
                                         Upload</div>
                                     <div class="my-auto w-60 px-10 truncate text-zinc-400">
                                         Add an file here</div>
                                 </label>
-                                <input type="file" id="file" multiple hidden
+                                <input type="file" id="file" multiple hidden :disabled="files.length >= 5" @change="appendFile($event)"
                                     class="border-2 p-2 rounded-lg border-dashed text-zinc-400 file:bg-emerald-plus file:hover:bg-emerald-light 
                             file:transition-colors file:text-white file:py-3 file:px-3 file:mr-6 file:rounded-lg file:border-0" />
                             </div>
@@ -431,7 +424,7 @@ const toastMixin = Swal.mixin({
                                     </div>
                                     <button v-if="isUpdatePage" @click="deleteAttachFile(file)" type="reset"
                                         class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-5">clear</button>
-                                    <button v-else
+                                    <button v-else type="reset"
                                         @click="files.splice(files.indexOf(file), 1), userFiles.splice(files.indexOf(file), 1)"
                                         class="bg-red-500 hover:bg-red-400 hover:transition-colors text-white px-4 rounded-lg mx-5">clear</button>
                                 </div>
@@ -443,7 +436,7 @@ const toastMixin = Swal.mixin({
                         <div class="text-cyan-800 w-40 py-3 font-bold">Publish Date</div>
                         <div class="flex ml-1">
                             <input type="date" class="ann-publish-date bg-white mx-3 border-2 rounded-lg px-10 py-2"
-                                v-model="publishDate" @change="setDefualtValueCloseTimeAndPublishTime()">
+                                v-model="publishDate" @change="setDefaultValueCloseTimeAndPublishTime()">
                             <input type="time" class="ann-publish-time bg-white mx-3 border-2 rounded-lg px-10 py-2"
                                 v-model="publishTime" :disabled="disablePublishTime"
                                 :class="disablePublishTime ? 'cursor-not-allowed text-zinc-300' : ''">
@@ -453,7 +446,7 @@ const toastMixin = Swal.mixin({
                         <div class="text-cyan-800 w-40 py-3 font-bold">Close Date</div>
                         <div class="flex ml-1">
                             <input type="date" class="ann-close-date bg-white mx-3 border-2 rounded-lg px-10 py-2"
-                                v-model="closeDate" @change="setDefualtValueCloseTimeAndPublishTime()">
+                                v-model="closeDate" @change="setDefaultValueCloseTimeAndPublishTime()">
                             <input type="time" class="ann-close-time bg-white mx-3 border-2 rounded-lg px-10 py-2"
                                 v-model="closeTime" :disabled="disableCloseTime"
                                 :class="disableCloseTime ? 'cursor-not-allowed text-zinc-300' : ''">

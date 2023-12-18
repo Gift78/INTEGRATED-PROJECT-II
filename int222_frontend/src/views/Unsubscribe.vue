@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import unsubIcon from '../components/icons/unsubIcon.vue'
 import { useRoute } from 'vue-router';
 import { getAllCategories } from '../composable/getData.js'
+import router from '../router';
 
 const { query } = useRoute();
 const categoryName = ref('')
@@ -54,7 +55,7 @@ const cancelButton = () => {
                 'You have been redirected to the home page',
                 'success'
             ).then(() => {
-                window.location.href = '/'
+                router.push({ name: '/'  })
             })
         }
     })
