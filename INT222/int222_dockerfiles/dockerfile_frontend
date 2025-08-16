@@ -1,0 +1,9 @@
+FROM node:19 AS build
+COPY /int222_frontend/ /Frontend/
+WORKDIR /Frontend/
+RUN npm install
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /Frontend/dist/ /usr/share/nginx/html/
+COPY default.conf /etc/nginx/conf.d/

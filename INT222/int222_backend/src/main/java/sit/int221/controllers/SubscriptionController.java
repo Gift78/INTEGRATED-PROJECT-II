@@ -1,0 +1,59 @@
+package sit.int221.controllers;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import sit.int221.dtos.OtpRequestDTO;
+import sit.int221.dtos.OtpVerificationRequest;
+import sit.int221.exceptions.OtpRetryLimitExceededException;
+import sit.int221.services.OtpService;
+import sit.int221.services.SubscriptionService;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/subscription")
+@CrossOrigin(origins = {"http://localhost:5173", "https://intproj22.sit.kmutt.ac.th", "http://127.0.0.1:5173"})
+@RequiredArgsConstructor
+public class SubscriptionController {
+    private final OtpService otpService;
+    private final SubscriptionService subscriptionService;
+
+    @PostMapping("/generate-otp")
+    public ResponseEntity<?> generateOtp(@RequestBody OtpRequestDTO otpRequest) {
+        try {
+            String otp = otpService.generateOtp(otpRequest.getEmail());
+            otpService.sendOtp(otpRequest.getEmail(), otp);
+
+            return ResponseEntity.ok(Map.of("message", "OTP sent successfully"));
+        } catch (OtpRetryLimitExceededException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "OTP generation limit exceeded. Please try again after some time."));
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody OtpVerificationRequest otpRequest) {
+        boolean isOtpValid = otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
+
+        if (isOtpValid) {
+            subscriptionService.subscribe(otpRequest.getEmail(), otpRequest.getCategoryIds());
+            subscriptionService.sendOtpSubscribeResponseEmail(otpRequest.getEmail(), otpRequest.getCategoryIds());
+            return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid OTP"));
+        }
+    }
+
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<?> unsubscribe(@RequestBody Map<String, Object> request) {
+        String token = (String) request.get("token");
+        Integer categoryId = (Integer) request.get("categoryId");
+        if (token != null) {
+            subscriptionService.unsubscribe(token, categoryId);
+            return ResponseEntity.ok(Map.of("message", "Unsubscribed successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid or expired token"));
+        }
+    }
+}

@@ -1,0 +1,92 @@
+package sit.int221.services;
+
+import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import sit.int221.entities.Announcement;
+import sit.int221.entities.UnsubscribeToken;
+import sit.int221.repositories.UnsubscribeTokenRepository;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Base64;
+
+@Service
+@RequiredArgsConstructor
+public class EmailService {
+    private static final String BASE_URL = "https://intproj22.sit.kmutt.ac.th/kw2";
+
+    private final JavaMailSender javaMailSender;
+    private final UnsubscribeTokenRepository unsubscribeTokenRepository;
+
+    @Async
+    public void sendEmail(String to, String subject, String text) {
+        try {
+            MimeMessageHelper message = new MimeMessageHelper(javaMailSender.createMimeMessage(), true, "UTF-8");
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(text, true);
+            javaMailSender.send(message.getMimeMessage());
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendSubscriberEmail(String email, Announcement announcement) {
+        String text = getAnnouncementTemplate(email, announcement.getAnnouncementDescription(), announcement.getId(), announcement.getCategory().getId());
+        sendEmail(email, announcement.getAnnouncementTitle(), text);
+    }
+
+    public String getAnnouncementTemplate(String email, String announcementDescription, Integer announcementId, Integer categoryId) {
+        String token = generateUnsubscribeToken(email);
+        return announcementDescription + "<br><br>" +
+                "<a href=\"" + BASE_URL + "/announcement/" + announcementId + "\">Announcement Link</a>" +
+                "<br>" +
+                "<a href=\"" + BASE_URL + "/unsubscribe?token=" + token + "&categoryId=" + categoryId + "\">Unsubscribe Link</a>";
+    }
+
+    public String generateUnsubscribeToken(String email) {
+        UnsubscribeToken existingToken = unsubscribeTokenRepository.findByEmail(email);
+        if (existingToken != null) {
+            unsubscribeTokenRepository.delete(existingToken);
+        }
+
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[24];
+        secureRandom.nextBytes(randomBytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+
+        UnsubscribeToken unsubscribeToken = new UnsubscribeToken();
+        unsubscribeToken.setEmail(email);
+        unsubscribeToken.setToken(token);
+        unsubscribeToken.setGeneratedAt(LocalDateTime.now());
+
+        unsubscribeTokenRepository.save(unsubscribeToken);
+
+        return token;
+    }
+
+    public String getOtpTemplate(String otp) {
+        return "<div style=\"background-color: #f2f2f2; padding: 50px;\">\n" +
+                "    <div style=\"background-color: white; padding: 50px; border-radius: 10px;\">\n" +
+                "        <h1 style=\"text-align: center; color: #ff6f00;\">OTP Verification</h1>\n" +
+                "        <p style=\"text-align: center; color: #ff6f00;\">Your OTP is <b>" + otp + "</b></p>\n" +
+                "        <p style=\"text-align: center; color: #ff6f00;\">Please enter this OTP to verify your email.</p>\n" +
+                "        <p style=\"text-align: center; color: #ff6f00;\">This OTP will expire in 5 minutes.</p>\n" +
+                "        <p style=\"text-align: center; color: #ff6f00;\">Thank you for using our service.</p>\n" +
+                "    </div>\n" +
+                "</div>";
+    }
+
+    public String getOtpResponseTemplate(String categoryName) {
+        return "<div style=\"background-color: #f2f2f2; padding: 50px;\">\n" +
+                "    <div style=\"background-color: white; padding: 50px; border-radius: 10px;\">\n" +
+                "        <h1 style=\"text-align: center; color: #ff6f00;\">You have successfully subscribed to category <b>" + categoryName + "</b></h1>\n" +
+                "        <p style=\"text-align: center; color: #ff6f00;\">Thank you for using our service.</p>\n" +
+                "    </div>\n" +
+                "</div>";
+    }
+}
